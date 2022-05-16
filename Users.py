@@ -1,17 +1,35 @@
 from sqlalchemy.orm import sessionmaker
-from security_databases import User, engine
+from security_databases import User, engine, Token
+from Exceptions import *
+from flask import request, render_template
+
 import secrets
 import string
-import os
 import hmac
 import hashlib
-import binascii
+import base64
+
+
+def generateRandomString(length):
+    alphabet = string.ascii_letters + string.digits
+    res = ''.join(secrets.choice(alphabet) for i in range(length))
+    return res
+
+
+def decodeToken(token):
+    token = token.encode()
+    token = base64.b64decode(token).decode()
+    return token
+
+# generate token in format {random string of 32 length}:{login}
+def generateToken(login):
+    token = f'{generateRandomString(32)}:{login}'.encode()
+    token = base64.b64encode(token).decode()
+    return token
 
 
 def generateSalt():
-    alphabet = string.ascii_letters + string.digits
-    salt = ''.join(secrets.choice(alphabet) for i in range(8))
-    return salt
+    return generateRandomString(8)
 
 
 def hashPassword(password, salt):
@@ -41,6 +59,26 @@ class UsersService:
         self.__dao.addUser(user)
 
         return True
+
+    # login to given account
+    def login(self, login, password):
+        # check password
+        if not self.isPasswordCorrect(login, password):
+            raise Unauthorized("Incorrect login or password")
+
+        # TODO: return token value (when token service is added)
+        return "token"
+
+    # check if given password is correct for given account
+    def isPasswordCorrect(self, login, password):
+        user = self.__dao.getUserByLogin(login)
+
+        if user is None:
+            return False
+
+        password = hashPassword(password, user.salt)
+
+        return password == user.password
 
 
 class UsersDAO:
@@ -81,14 +119,34 @@ class UsersDAO:
         session.flush()
         session.commit()
 
+    def saveToken(self, token):
+        session = self.__createSession()
+        session.add(token)
+        session.commit()
+
+
+class UsersController:
+    __service = UsersService()
+
+    @staticmethod
+    def login():
+        if request.method == 'GET':
+            return render_template('login.html')
+        elif request.method == 'POST':
+            return 'POST LOGIN'
+
+    @staticmethod
+    def register():
+        if request.method == 'GET':
+            return render_template('register.html')
+        elif request.method == 'POST':
+            print(request.form)
+            return 'POST REGISTER'
+
 
 if __name__ == '__main__':
-    dao = UsersDAO()
     service = UsersService()
-    # dao.addUser(User("user1", "pass1", "salt1"))
-    # dao.addUser(User("user2", "pass2", "salt2"))
-    # dao.addUser(User("user3", "pass3", "salt3"))
-    # print(dao.getUserByLogin('user1'))
-    # dao.updatePassword('user1', 'newpassword1')
-    # print(dao.getUserByLogin('user1'))
-    service.createNewUser("newuser", "newpassword")
+    token = generateToken("login")
+    print(token)
+    print(decodeToken(token))
+    # print(service.decodeToken(token))

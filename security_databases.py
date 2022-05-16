@@ -23,5 +23,13 @@ class User(Base):
                '}'
 
 
+class Token(Base):
+    __tablename__ = "tokens"
+    token = Column('token', String(300), primary_key=True)
+
+    def __init__(self, token, user):
+        self.token = token
+
+
 engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')
 Base.metadata.create_all(bind=engine)
