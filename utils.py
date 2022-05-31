@@ -11,6 +11,7 @@ def generateRandomString(length):
     return res
 
 
+# decoding token, on return tuple with decoded token and login
 def decodeToken(token):
     token = token.encode()
     token = base64.b64decode(token).decode()

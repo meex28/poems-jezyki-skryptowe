@@ -2,6 +2,7 @@ from DAOs import *
 from utils import *
 from exceptions import *
 
+
 class UsersService:
     def __init__(self):
         self.__dao = UsersDAO()
@@ -21,7 +22,7 @@ class UsersService:
         user = User(login, password, salt)
 
         # TODO: add exceptions
-        self.__dao.add(user)
+        self.__dao.addUser(user)
 
         return True
 
@@ -33,7 +34,7 @@ class UsersService:
 
         # generate and save token
         token = generateToken(login)
-        self.__dao.add(token)
+        self.__dao.addToken(token)
 
         return token
 
@@ -47,6 +48,9 @@ class UsersService:
         password = hashPassword(password, user.salt)
 
         return password == user.password
+
+    # def checkToken(self, token):
+    #     checkedToken = self.__dao.
 
 
 class WorksService:
