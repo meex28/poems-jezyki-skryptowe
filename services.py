@@ -34,7 +34,8 @@ class UsersService:
 
         # generate and save token
         token = generateToken(login)
-        self.__dao.addToken(token)
+        tokenObj = Token(token)
+        self.__dao.addToken(tokenObj)
 
         return token
 
@@ -49,8 +50,19 @@ class UsersService:
 
         return password == user.password
 
-    # def checkToken(self, token):
-    #     checkedToken = self.__dao.
+    # check if given token is valid
+    # return (boolean, string) : (is token valid, login)
+    def checkToken(self, token):
+        # token is Token object
+        token = self.__dao.getToken(token)
+
+        isTokenValid = token is not None
+        user = None
+
+        if isTokenValid:
+            token, user = decodeToken(token.token)
+
+        return isTokenValid, user
 
 
 class WorksService:

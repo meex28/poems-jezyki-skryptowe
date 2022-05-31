@@ -54,7 +54,7 @@ class Token(Base):
     __tablename__ = "tokens"
     __token = Column('token', String(300), primary_key=True)
 
-    def __init__(self, token, user):
+    def __init__(self, token):
         self.__token = token
 
     @property
