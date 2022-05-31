@@ -1,48 +1,15 @@
 from sqlalchemy.orm import sessionmaker
-from security_databases import User, engine, Token
+from databases import User, engine, Token
 from Exceptions import *
 from flask import request, render_template
-
-import secrets
-import string
-import hmac
-import hashlib
-import base64
-
-
-def generateRandomString(length):
-    alphabet = string.ascii_letters + string.digits
-    res = ''.join(secrets.choice(alphabet) for i in range(length))
-    return res
-
-
-def decodeToken(token):
-    token = token.encode()
-    token = base64.b64decode(token).decode()
-    return token
-
-# generate token in format {random string of 32 length}:{login}
-def generateToken(login):
-    token = f'{generateRandomString(32)}:{login}'.encode()
-    token = base64.b64encode(token).decode()
-    return token
-
-
-def generateSalt():
-    return generateRandomString(8)
-
-
-def hashPassword(password, salt):
-    password = password.encode()
-    salt = salt.encode()
-
-    return hmac.new(password, salt, hashlib.sha256).hexdigest()
+from utils import *
 
 
 class UsersService:
     def __init__(self):
         self.__dao = UsersDAO()
 
+    # check if login is already used
     def isLoginAvailable(self, login):
         user = self.__dao.getUserByLogin(login)
         return user is None
@@ -51,12 +18,13 @@ class UsersService:
         if not self.isLoginAvailable(login):
             raise ValueError("Login is already used")
 
+        # prepare password and save user in DB
         salt = generateSalt()
         password = hashPassword(password, salt)
         user = User(login, password, salt)
 
         # TODO: add exceptions
-        self.__dao.addUser(user)
+        self.__dao.add(user)
 
         return True
 
@@ -66,8 +34,11 @@ class UsersService:
         if not self.isPasswordCorrect(login, password):
             raise Unauthorized("Incorrect login or password")
 
-        # TODO: return token value (when token service is added)
-        return "token"
+        # generate and save token
+        token = generateToken(login)
+        self.__dao.add(token)
+
+        return token
 
     # check if given password is correct for given account
     def isPasswordCorrect(self, login, password):
@@ -81,28 +52,11 @@ class UsersService:
         return password == user.password
 
 
-class UsersDAO:
-    def __createSession(self):
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        return session
-
-    def addUser(self, user):
-        session = self.__createSession()
-
-        session.add(user)
-        session.commit()
-
+class UsersDAO(DAO):
     def deleteUserByLogin(self, login):
         session = self.__createSession()
 
         user = session.query(User).get(login)
-        session.delete(user)
-        session.commit()
-
-    def deleteUser(self, user):
-        session = self.__createSession()
-
         session.delete(user)
         session.commit()
 
@@ -119,11 +73,6 @@ class UsersDAO:
         session.flush()
         session.commit()
 
-    def saveToken(self, token):
-        session = self.__createSession()
-        session.add(token)
-        session.commit()
-
 
 class UsersController:
     __service = UsersService()
@@ -133,6 +82,7 @@ class UsersController:
         if request.method == 'GET':
             return render_template('login.html')
         elif request.method == 'POST':
+            print(request.form)
             return 'POST LOGIN'
 
     @staticmethod
@@ -145,8 +95,11 @@ class UsersController:
 
 
 if __name__ == '__main__':
-    service = UsersService()
-    token = generateToken("login")
-    print(token)
-    print(decodeToken(token))
+    # service = UsersService()
+    # service.createNewUser('orzel11', 'orzel')
+    dao = UsersDAO()
+    print(dao.getUserByLogin('orzel11'))
+    # token = generateToken("login")
+    # print(token)
+    # print(decodeToken(token))
     # print(service.decodeToken(token))
