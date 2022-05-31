@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Enum, Column, String, Integer, Boolean, TEXT
 from sqlalchemy.ext.declarative import declarative_base
-from enum import Enum
+from enum import Enum as Enumeration
 
 Base = declarative_base()
 
@@ -66,7 +66,7 @@ class Token(Base):
         self.__token = value
 
 
-class WorkType(Enum):
+class WorkType(Enumeration):
     POEM = 1
     PROSE = 2
     DRAMA = 3

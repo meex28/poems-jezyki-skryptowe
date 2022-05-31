@@ -4,31 +4,6 @@ import hmac
 import hashlib
 import base64
 
-from enum import Enum
-from sqlalchemy.orm import sessionmaker
-from databases import engine
-
-
-class DAO:
-    def __createSession(self):
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        return session
-
-    def add(self, value, session=None):
-        if session is None:
-            session = self.__createSession()
-
-        session.add(value)
-        session.commit()
-
-    def delete(self, value, session=None):
-        if session is None:
-            session = self.__createSession()
-
-        session.delete(value)
-        session.commit()
-
 
 def generateRandomString(length):
     alphabet = string.ascii_letters + string.digits
