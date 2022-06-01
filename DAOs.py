@@ -2,11 +2,26 @@ from sqlalchemy.orm import sessionmaker
 from db import *
 
 
+def mergeSessions(obj1, obj2):
+    session1 = DAO.Session.object_session(obj1)
+    session2 = DAO.Session.object_session(obj2)
+
+    if session1 is None and session2 is None:
+        return
+    elif session1 is None:
+        session2.add(obj1)
+    elif session2 is None:
+        session1.add(obj2)
+    else:
+        session1.expunge(obj1)
+        session2.add(obj1)
+
 # base dao class, used for create, delete and get operations
 class DAO:
+    Session = sessionmaker(bind=engine)
+
     def _createSession(self):
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        session = DAO.Session()
         return session
 
     def _add(self, value, session=None):
@@ -45,6 +60,9 @@ class UsersDAO(DAO):
         user = super()._get(User, login, session=session)
         super()._delete(user, session=session)
 
+        # delete user opinions
+        opinions = session.query(Opinion).filter(Opinion.author_login == None).delete()
+
     def getUserByLogin(self, login):
         user = super()._get(User, login)
         return user
@@ -76,10 +94,30 @@ class PoemsDAO(DAO):
 
     def getPoemsByAuthor(self, author):
         session = super()._createSession()
-        result = session.query(Poem).filter(Poem.author == author).all()
+        result = session.query(Poem).filter(Poem.author == author, Poem.isUserAuthor == False).all()
+        return result
+
+    def getPoemsByUser(self, user):
+        session = super()._createSession()
+        result = session.query(Poem).filter(Poem.author == user, Poem.isUserAuthor == True).all()
         return result
 
     def getLastPoems(self, number):
         session = super()._createSession()
         result = session.query(Poem).order_by(-Poem.id).limit(number).all()
         return result
+
+
+class OpinionsDAO(DAO):
+    # get session from opinion's author (user)
+    # without that opinion and user/poem are in different sessions
+    # TODO: add deleting opinion when user/poem is deleted
+    def addOpinion(self, opinion):
+        session = DAO.Session.object_session(opinion.user)
+        super()._add(opinion, session=session)
+
+    def getPoemOpinions(self, poem):
+        session = super()._createSession()
+        opinions = session.query(Opinion).filter(Opinion.poem_id == poem.id).all()
+        return opinions
+

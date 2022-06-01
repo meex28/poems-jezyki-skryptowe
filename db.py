@@ -1,5 +1,6 @@
-from sqlalchemy import create_engine, Column, String, Integer, Boolean, TEXT
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, TEXT, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -10,6 +11,8 @@ class User(Base):
     __login = Column('login', String(255), primary_key=True)
     __password = Column('password', String(255))
     __salt = Column('salt', String(255))
+
+    opinions = relationship('Opinion', backref='user')
 
     def __init__(self, login, password, salt):
         self.__login = login
@@ -73,6 +76,8 @@ class Poem(Base):
     isUserAuthor = Column('is_user_author', Boolean)
     content = Column('content', TEXT)
 
+    opinions = relationship('Opinion', backref='poem')
+
     def __init__(self, author, title, content, isUserAuthor):
         self.author = author
         self.title = title
@@ -82,57 +87,23 @@ class Poem(Base):
     def __str__(self):
         return f'{self.id} : {self.author} : {self.title} : {self.isUserAuthor} : {self.content}'
 
-# # storing works in database
-# class Poem(Base):
-#     __tablename__ = "poems"
-#     id = Column('id', Integer, primary_key=True, autoincrement=True)
-#     author = Column('author', String(255))
-#     title = Column('title', String(255))
-#     isUserAuthor = Column('is_user_author', Boolean)
-#     content = Column('content', TEXT)
-#
-#     def __init__(self, author, title, content, isUserAuthor):
-#         self.__author = author
-#         self.__title = title
-#         self.__isUserAuthor = isUserAuthor
-#         self.__content = content
-#
-#     @property
-#     def author(self):
-#         return self.__author
-#
-#     @author.setter
-#     def author(self, value):
-#         self.__author = value
-#
-#     @property
-#     def title(self):
-#         return self.__title
-#
-#     @title.setter
-#     def title(self, value):
-#         self.__title = value
-#
-#     @property
-#     def isUserAuthor(self):
-#         return self.__isUserAuthor
-#
-#     @isUserAuthor.setter
-#     def isUserAuthor(self, value):
-#         self.__isUserAuthor = value
-#
-#     @property
-#     def content(self):
-#         return self.__content
-#
-#     @content.setter
-#     def content(self, value):
-#         self.__content = value
 
+class Opinion(Base):
+    __tablename__ = 'opinions'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    content = Column('content', String(1024))
+    rating = Column('rating', Integer)
+    poem_id = Column(Integer, ForeignKey('poems.id', ondelete='CASCADE'), nullable=False)
+    author_login = Column(String(255), ForeignKey('users.login', ondelete='CASCADE'), nullable=False)
 
-# class Opinion(Base):
-#     __tablename__ = 'opinions'
-#     __id =
+    def __init__(self, content, rating, user, poem):
+        self.content = content
+        self.rating = rating
+        self.user = user
+        self.poem = poem
+
+    def __str__(self):
+        return f'{self.id} : {self.author_login} : {self.poem_id} : {self.rating} : {self.content}'
 
 # creating mysql engine, and connect to DB
 engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')

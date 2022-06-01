@@ -78,6 +78,51 @@ def getLastPoems():
     for x in dao.getLastPoems(5):
         print(x)
 
+def testAddingOpinions():
+    UsersService().createNewUser('orzel1', 'a')
+    usersDao = UsersDAO()
+    poemsDao = PoemsDAO()
+    opinionsDao = OpinionsDAO()
+
+    user = usersDao.getUserByLogin('orzel1')
+    poem = poemsDao.getPoemById(1)
+
+    mergeSessions(user, poem)
+
+    opinion = Opinion(content='aaa', rating=2, poem=poem, user=user)
+    opinionsDao.addOpinion(opinion)
+
+def delete():
+    usersDao = UsersDAO()
+    usersDao.deleteUserByLogin('orzel1')
+
+def addOpinions():
+    usersDao = UsersDAO()
+    poemsDao = PoemsDAO()
+    opinionsDao = OpinionsDAO()
+    user1 = usersDao.getUserByLogin('user1')
+    user2 = usersDao.getUserByLogin('user2')
+    poem = poemsDao.getPoemById(2)
+
+    mergeSessions(user1, poem)
+    op1 = Opinion('a', 2, user1, poem)
+    opinionsDao.addOpinion(op1)
+
+    mergeSessions(user2, poem)
+    op2 = Opinion('b', 5, user2, poem)
+    opinionsDao.addOpinion(op2)
+
+    poem = poemsDao.getPoemById(2)
+
+    for x in opinionsDao.getPoemOpinions(poem):
+        print(x)
+
+def getPoem():
+    service = PoemsService()
+    poem = service.getPoem(1)
+
+    print(poem)
+
 if __name__ == '__main__':
     # testUsersDao()
     # testUsersDeleting()
@@ -85,5 +130,9 @@ if __name__ == '__main__':
     # testPoemsDAO()
     # testAddingPoems()
     # searchingPoems()
-    getLastPoems()
+    # getLastPoems()
+    # testAddingOpinions()
+    # delete()
+    # addOpinions()
+    # getPoem()
     pass

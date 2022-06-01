@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Poem</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+    <form action="{{ url_for('addPoem') }}" method="post">
+        <p>Autor</p>
+        <input type="text" name="author">
+        <p>Czy wiersz jest autorski?</p>
+        <input type="checkbox" name="isUserAuthor">
+        <p>Tytuł</p>
+        <input type="text" name="title">
+        <p>Treść utworu</p>
+        <input type="text" name="content">
+
+        <button type="submit">Dodaj</button>
+    </form>
+</body>
+</html>

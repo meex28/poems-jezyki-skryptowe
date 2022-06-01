@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ poem.title }}</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+    <p>{{ poem.author }}</p>
+    <p>{{ poem.title }}</p>
+    <p>{{ poem.content }}</p>
+
+    <p>Średnia ocena: {{ poem.rating }}</p>
+    <p>Opinie:</p>
+    {% for opinion in poem.opinions %}
+        <p>Autor: {{ opinion.author }} | Ocena: {{ opinion.rating }}</p>
+        <p>{{ opinion.content }}</p>
+    {% endfor %}
+</body>
+</html>

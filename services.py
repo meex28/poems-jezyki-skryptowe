@@ -69,6 +69,7 @@ class UsersService:
 class PoemsService:
     def __init__(self):
         self.__poemsDAO = PoemsDAO()
+        self.__opinionsDAO = OpinionsDAO()
 
     def addPoem(self, author, title, content, isUserAuthor=False):
         if author == '' or content == '':
@@ -91,15 +92,36 @@ class PoemsService:
 
     def getPoem(self, id):
         poem = self.__poemsDAO.getPoemById(id)
+        opinions = self.__opinionsDAO.getPoemOpinions(poem)
+        # make opinions DTO objects from poem (drop poem_id, id)
+        opinionsDTO = [OpinionDTO(opinion.author_login, opinion.content, opinion.rating) for opinion in opinions]
 
-        # TODO: pass opinions in constructor
-        poemDTO = PoemDTO(poem.author, poem.title, poem.content, None, None)
+        # count average rating on poem opinions
+        ratingAvg = 0
+        for opinion in opinionsDTO:
+            ratingAvg += opinion.rating
+        if len(opinionsDTO) != 0:
+            ratingAvg /= len(opinionsDTO)
+
+        poemDTO = PoemDTO(poem.author, poem.title, poem.content, ratingAvg, opinionsDTO)
 
         return poemDTO
 
+    # create DTO objects to preview poems (contains id, author, title) from poem objects
     def _poemsToPoemsPreviewDTO(self, poems):
         poemsDTO = [PoemPreviewDTO(f'poem/{poem.id}', poem.author, poem.title, None) for poem in poems]
         return poemsDTO
+
+    # get username
+    # return username and his poems
+    def getUserPoemsPreviews(self, author):
+        poems = self.__poemsDAO.getPoemsByUser(author)
+
+        # check if given author exist in DB
+        if len(poems) == 0:
+            raise ValueError('Brak podanego autora w bazie!')
+
+        return author, self._poemsToPoemsPreviewDTO(poems)
 
     # get author name in format with _ instead of whitespaces
     # return parsed author name and his poems

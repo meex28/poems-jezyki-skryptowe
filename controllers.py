@@ -9,6 +9,9 @@ def registerEndpoints(app):
     app.add_url_rule('/register', view_func=UsersController.register, methods=["POST", "GET"])
     app.add_url_rule('/', view_func=PoemsController.mainPage, methods=['GET'])
     app.add_url_rule('/author/<string:author>', view_func=PoemsController.authorPage, methods=['GET'])
+    app.add_url_rule('/user/<string:author>', view_func=PoemsController.userAuthorPage, methods=['GET'])
+    app.add_url_rule('/poem/<int:id>', view_func=PoemsController.poemPage, methods=['GET'])
+    app.add_url_rule('/add', view_func=PoemsController.addPoem, methods=['GET', 'POST'])
 
 
 class UsersController:
@@ -61,3 +64,28 @@ class PoemsController:
         # TODO: add exception handling
         author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
         return render_template('author_page.html', poems=poems, author=author)
+
+    @staticmethod
+    def userAuthorPage(author):
+        # TODO: add exception handling
+        author, poems = PoemsController.__service.getUserPoemsPreviews(author)
+        return render_template('author_page.html', poems=poems, author=author)
+
+    @staticmethod
+    def poemPage(id):
+        poem = PoemsController.__service.getPoem(id)
+        return render_template('poem_page.html', poem=poem)
+
+    @staticmethod
+    def addPoem():
+        if request.method == 'GET':
+            return render_template('add_poem_page.html')
+        elif request.method == 'POST':
+            author = request.form.get('author')
+            isUserAuthor = request.form.get('isUserAuthor') == 'on'
+            title = request.form.get('title')
+            content = request.form.get('content')
+            PoemsController.__service.addPoem(author, title, content, isUserAuthor)
+
+            # TODO: add message of result
+            return redirect(url_for('addPoem'))
