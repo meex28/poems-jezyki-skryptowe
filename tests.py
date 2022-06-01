@@ -36,8 +36,54 @@ def testTokens():
 
     dao.deleteUserByLogin('testUser')
 
+
+def testPoemsDAO():
+    dao = PoemsDAO()
+    poem = Poem('Konstanty Ildefons Gałczyński', "List jenca", "Kochanie moje, kochanie", False)
+    dao.addPoem(poem)
+
+
+def testAddingPoems():
+    service = PoemsService()
+    service.addPoem('a', "List jenca", "Kochanie moje, kochanie")
+    print(service.getPoem(2))
+
+    try:
+        service.addPoem('', "a", "a")
+    except ValueError:
+        print("value error")
+
+    try:
+        service.addPoem('a', "a", "")
+    except ValueError:
+        print("value error")
+
+def searchingPoems():
+    dao = PoemsDAO()
+
+    # poem1 = Poem('Halina Poswiatowska', "a", 'a', False)
+    # poem2 = Poem('Halina Poswiatowska', "b", 'b', False)
+    # poem3 = Poem('Halina Poswiatowska', "c", 'c', False)
+    #
+    # dao.addPoem(poem1)
+    # dao.addPoem(poem2)
+    # dao.addPoem(poem3)
+
+    for x in dao.getPoemsByAuthor('Konstanty Ildefons Gałczyński'):
+        print(x)
+
+def getLastPoems():
+    dao = PoemsDAO()
+
+    for x in dao.getLastPoems(5):
+        print(x)
+
 if __name__ == '__main__':
     # testUsersDao()
     # testUsersDeleting()
-    testTokens()
+    # testTokens()
+    # testPoemsDAO()
+    # testAddingPoems()
+    # searchingPoems()
+    getLastPoems()
     pass

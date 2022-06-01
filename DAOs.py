@@ -43,7 +43,7 @@ class UsersDAO(DAO):
     def deleteUserByLogin(self, login):
         session = super()._createSession()
         user = super()._get(User, login, session=session)
-        super()._delete(user,session=session)
+        super()._delete(user, session=session)
 
     def getUserByLogin(self, login):
         user = super()._get(User, login)
@@ -66,5 +66,20 @@ class UsersDAO(DAO):
     def addToken(self, token):
         super()._add(token)
 
-class WorksDAO(DAO):
-    pass
+
+class PoemsDAO(DAO):
+    def addPoem(self, poem):
+        super()._add(poem)
+
+    def getPoemById(self, id):
+        return super()._get(Poem, id)
+
+    def getPoemsByAuthor(self, author):
+        session = super()._createSession()
+        result = session.query(Poem).filter(Poem.author == author).all()
+        return result
+
+    def getLastPoems(self, number):
+        session = super()._createSession()
+        result = session.query(Poem).order_by(-Poem.id).limit(number).all()
+        return result

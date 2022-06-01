@@ -1,6 +1,5 @@
-from sqlalchemy import create_engine, Enum, Column, String, Integer, Boolean, TEXT
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, TEXT
 from sqlalchemy.ext.declarative import declarative_base
-from enum import Enum as Enumeration
 
 Base = declarative_base()
 
@@ -66,68 +65,69 @@ class Token(Base):
         self.__token = value
 
 
-class WorkType(Enumeration):
-    POEM = 1
-    PROSE = 2
-    DRAMA = 3
+class Poem(Base):
+    __tablename__ = "poems"
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    author = Column('author', String(255))
+    title = Column('title', String(255))
+    isUserAuthor = Column('is_user_author', Boolean)
+    content = Column('content', TEXT)
 
+    def __init__(self, author, title, content, isUserAuthor):
+        self.author = author
+        self.title = title
+        self.isUserAuthor = isUserAuthor
+        self.content = content
 
-# storing works in database
-class Work(Base):
-    __tablename__ = "works"
-    __id = Column('id', Integer, primary_key=True, autoincrement=True)
-    __author = Column('author', String(255))
-    __title = Column('title', String(255))
-    __type = Column('type', Enum(WorkType))
-    __isUserAuthor = Column('is_user_author', Boolean)
-    __content = Column('content', TEXT)
+    def __str__(self):
+        return f'{self.id} : {self.author} : {self.title} : {self.isUserAuthor} : {self.content}'
 
-    def __init__(self, author, title, type, isUserAuthor, content):
-        self.__author = author
-        self.__title = title
-        self.__type = type
-        self.__isUserAuthor = isUserAuthor
-        self.__content = content
-
-    @property
-    def author(self):
-        return self.__author
-
-    @author.setter
-    def author(self, value):
-        self.__author = value
-
-    @property
-    def title(self):
-        return self.__title
-
-    @title.setter
-    def title(self, value):
-        self.__title = value
-
-    @property
-    def type(self):
-        return self.__type
-
-    @type.setter
-    def type(self, value):
-        self.__type = value
-
-    @property
-    def isUserAuthor(self):
-        return self.__isUserAuthor
-
-    @isUserAuthor.setter
-    def isUserAuthor(self, value):
-        self.__isUserAuthor = value
-
-    @property
-    def content(self):
-        return self.__content
-
-    @content.setter
-    def content(self, value):
-        self.__content = value
+# # storing works in database
+# class Poem(Base):
+#     __tablename__ = "poems"
+#     id = Column('id', Integer, primary_key=True, autoincrement=True)
+#     author = Column('author', String(255))
+#     title = Column('title', String(255))
+#     isUserAuthor = Column('is_user_author', Boolean)
+#     content = Column('content', TEXT)
+#
+#     def __init__(self, author, title, content, isUserAuthor):
+#         self.__author = author
+#         self.__title = title
+#         self.__isUserAuthor = isUserAuthor
+#         self.__content = content
+#
+#     @property
+#     def author(self):
+#         return self.__author
+#
+#     @author.setter
+#     def author(self, value):
+#         self.__author = value
+#
+#     @property
+#     def title(self):
+#         return self.__title
+#
+#     @title.setter
+#     def title(self, value):
+#         self.__title = value
+#
+#     @property
+#     def isUserAuthor(self):
+#         return self.__isUserAuthor
+#
+#     @isUserAuthor.setter
+#     def isUserAuthor(self, value):
+#         self.__isUserAuthor = value
+#
+#     @property
+#     def content(self):
+#         return self.__content
+#
+#     @content.setter
+#     def content(self, value):
+#         self.__content = value
 
 
 # class Opinion(Base):

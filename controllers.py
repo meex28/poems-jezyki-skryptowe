@@ -1,5 +1,5 @@
 from services import *
-from flask import render_template, request
+from flask import render_template, request, make_response, redirect, url_for
 
 
 # app - Flask app object
@@ -7,6 +7,8 @@ from flask import render_template, request
 def registerEndpoints(app):
     app.add_url_rule('/login', view_func=UsersController.login, methods=["POST", "GET"])
     app.add_url_rule('/register', view_func=UsersController.register, methods=["POST", "GET"])
+    app.add_url_rule('/', view_func=PoemsController.mainPage, methods=['GET'])
+    app.add_url_rule('/author/<string:author>', view_func=PoemsController.authorPage, methods=['GET'])
 
 
 class UsersController:
@@ -18,7 +20,18 @@ class UsersController:
             return render_template('login.html')
         elif request.method == 'POST':
             print(request.form)
-            return 'POST LOGIN'
+
+            if request.form.get('submit') == 'login':
+                user, password = request.form.get('login'), request.form.get('password')
+                try:
+                    token = UsersController.__service.login(user, password)
+                    resp = make_response(redirect(url_for('mainPage')))
+                    resp.set_cookie('token', token)
+                    return resp
+                except Unauthorized as e:
+                    return e.message
+            elif request.form.get('submit') == 'register':
+                return redirect(url_for('register'))
 
     @staticmethod
     def register():
@@ -26,8 +39,25 @@ class UsersController:
             return render_template('register.html')
         elif request.method == 'POST':
             print(request.form)
-            return 'POST REGISTER'
+
+            if request.form.get('submit') == 'login':
+                return redirect(url_for('login'))
+            elif request.form.get('submit') == 'register':
+                user, password = request.form.get('login'), request.form.get('password')
+                UsersController.__service.createNewUser(user, password)
+                return redirect(url_for('login'))
 
 
-class WorksController:
-    pass
+class PoemsController:
+    __service = PoemsService()
+
+    @staticmethod
+    def mainPage():
+        poems = PoemsController.__service.getMainPagePoems()
+        return render_template('index.html', poems=poems)
+
+    @staticmethod
+    def authorPage(author):
+        # TODO: add exception handling
+        author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
+        return render_template('author_page.html', poems=poems, author=author)

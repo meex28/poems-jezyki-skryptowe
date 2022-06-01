@@ -1,6 +1,7 @@
 from DAOs import *
 from utils import *
 from exceptions import *
+from DTOs import *
 
 
 class UsersService:
@@ -65,5 +66,59 @@ class UsersService:
         return isTokenValid, user
 
 
-class WorksService:
-    pass
+class PoemsService:
+    def __init__(self):
+        self.__poemsDAO = PoemsDAO()
+
+    def addPoem(self, author, title, content, isUserAuthor=False):
+        if author == '' or content == '':
+            raise ValueError('Wiersz musi posiadac autora i tresc!')
+
+        if chr(0) in title:
+            raise ValueError('Niepoprawny tytul.')
+        elif title == '':
+            firstLine = content.split('\n')[0]
+            title = f"*** ({firstLine})"
+
+        poem = Poem(author, title, content, isUserAuthor)
+
+        try:
+            self.__poemsDAO.addPoem(poem)
+        except:
+            raise InternalServerError('Database error.')
+
+        return True
+
+    def getPoem(self, id):
+        poem = self.__poemsDAO.getPoemById(id)
+
+        # TODO: pass opinions in constructor
+        poemDTO = PoemDTO(poem.author, poem.title, poem.content, None, None)
+
+        return poemDTO
+
+    def _poemsToPoemsPreviewDTO(self, poems):
+        poemsDTO = [PoemPreviewDTO(f'poem/{poem.id}', poem.author, poem.title, None) for poem in poems]
+        return poemsDTO
+
+    # get author name in format with _ instead of whitespaces
+    # return parsed author name and his poems
+    def getAuthorPoemsPreviews(self, author):
+        # parse author name
+        author = author.replace('_', ' ')
+
+        poems = self.__poemsDAO.getPoemsByAuthor(author)
+
+        # check if given author exist in DB
+        if len(poems) == 0:
+            raise ValueError('Brak podanego autora w bazie!')
+
+        return author, self._poemsToPoemsPreviewDTO(poems)
+
+    def getMainPagePoems(self):
+        poems = self.__poemsDAO.getLastPoems(5)
+        # TODO: pass opinions in constructor
+
+        return self._poemsToPoemsPreviewDTO(poems)
+
+    # def getPoemsByAuthor(self, author, isUserAuthor=False):

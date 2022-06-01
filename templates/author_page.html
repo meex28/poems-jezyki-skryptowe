@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Poems</title>
+    <title>{{ author }}</title>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
-    <h1>Main page</h1>
-
-    <p>Poems here</p>
+    <h1>Wiersze {{ author }}</h1>
 
     {% for poem in poems %}
         <p>{{ poem.author }}</p>
