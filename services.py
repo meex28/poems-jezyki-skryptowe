@@ -71,6 +71,7 @@ class PoemsService:
     def __init__(self):
         self.__poemsDAO = PoemsDAO()
         self.__opinionsDAO = OpinionsDAO()
+        self.__usersDAO = UsersDAO()
 
     def addPoem(self, author, title, content, isUserAuthor=False):
         if author == '' or content == '':
@@ -102,7 +103,7 @@ class PoemsService:
         if len(opinionsDTO) != 0:
             ratingAvg /= len(opinionsDTO)
 
-        poemDTO = PoemDTO(poem.author, poem.title, poem.content, ratingAvg, opinionsDTO)
+        poemDTO = PoemDTO(id, poem.author, poem.title, poem.content, ratingAvg, opinionsDTO)
 
         return poemDTO
 
@@ -158,7 +159,7 @@ class PoemsService:
         return self.getPoem(poemId)
 
     # get tupple of (authorName, isUserAuthor)
-
+    # parse name and return DTO object of author
     def __authorsToDTO(self, poem):
         result = AuthorDTO(poem[0], poem[0], poem[1])
 
@@ -174,3 +175,21 @@ class PoemsService:
         authors = list(map(self.__authorsToDTO, authors))
 
         return authors
+
+    # add opinion to poem with id
+    def addOpinion(self, id, token, content, rating):
+        # TODO: add token validation
+        # decode token to get login and User object
+        author = decodeToken(token)[1]
+        author = self.__usersDAO.getUserByLogin(author)
+
+        rating = int(rating)
+
+        poem = self.__poemsDAO.getPoemById(id)
+
+        # create Opinion object and add to DB
+        opinion = createOpinion(content, rating, author, poem)
+        self.__opinionsDAO.addOpinion(opinion)
+
+        return True
+

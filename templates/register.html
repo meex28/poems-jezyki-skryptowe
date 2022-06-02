@@ -7,27 +7,29 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
-<div class="login-form">
-  <form action="{{ url_for('register') }}" method="post">
-      <h1>Rejestracja</h1>
-    <div class="content">
-      <div class="input-field">
-        <input name="login" type="text" id="login" placeholder="Login" autocomplete="nope">
-      </div>
-      <div class="input-field">
-        <input name="password" type="password" id="password" placeholder="Hasło" autocomplete="new-password">
-      </div>
-    </div>
-    <div class="action register_action">
-      <button type="submit" value="register" name="submit" id="register_button">Zarejestruj</button>
-      <button type="submit" value="login" name="submit" id="login_button">Login</button>
-    </div>
-  </form>
-</div>
+    {% include "nav_bar.html" %}
 
-<script type="text/javascript">
-    document.getElementById("login_button").href = window.location.origin+'/login'
-</script>
+    <div class="login-form">
+      <form action="{{ url_for('register') }}" method="post">
+          <h1>Rejestracja</h1>
+        <div class="content">
+          <div class="input-field">
+            <input name="login" type="text" id="login" placeholder="Login" autocomplete="nope">
+          </div>
+          <div class="input-field">
+            <input name="password" type="password" id="password" placeholder="Hasło" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="action register_action">
+          <button type="submit" value="register" name="submit" id="register_button">Zarejestruj</button>
+          <button type="submit" value="login" name="submit" id="login_button">Login</button>
+        </div>
+      </form>
+    </div>
+
+    <script type="text/javascript">
+        document.getElementById("login_button").href = window.location.origin+'/login'
+    </script>
 
 </body>
 </html>

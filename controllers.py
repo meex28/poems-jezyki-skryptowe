@@ -10,11 +10,11 @@ def registerEndpoints(app):
     app.add_url_rule('/', view_func=PoemsController.mainPage, methods=['GET'])
     app.add_url_rule('/author/<string:author>', view_func=PoemsController.authorPage, methods=['GET'])
     app.add_url_rule('/user/<string:author>', view_func=PoemsController.userAuthorPage, methods=['GET'])
-    app.add_url_rule('/poem/<int:id>', view_func=PoemsController.poemPage, methods=['GET'])
+    app.add_url_rule('/poem/<int:id>', view_func=PoemsController.poemPage, methods=['GET', 'POST'])
     app.add_url_rule('/add', view_func=PoemsController.addPoem, methods=['GET', 'POST'])
     app.add_url_rule('/daily', view_func=PoemsController.dailyPoem, methods=['GET'])
     app.add_url_rule('/daily_personal', view_func=PoemsController.dailyPersonalPoem, methods=['GET'])
-    app.add_url_rule('/authors', view_func=PoemsController.authorsPage, methods=['GET'])
+    app.add_url_rule('/author', view_func=PoemsController.authorsPage, methods=['GET'])
 
 
 class UsersController:
@@ -76,8 +76,18 @@ class PoemsController:
 
     @staticmethod
     def poemPage(id):
-        poem = PoemsController.__service.getPoem(id)
-        return render_template('poem_page.html', poem=poem)
+        if request.method == 'GET':
+            poem = PoemsController.__service.getPoem(id)
+            return render_template('poem_page.html', poem=poem)
+        elif request.method == 'POST':
+            if request.cookies.get('token') is None:
+                return redirect(url_for('login'))
+
+            PoemsController.__service.addOpinion(id, request.cookies.get('token'),
+                                                 request.form.get('content'), request.form.get('rating'))
+            poem = PoemsController.__service.getPoem(id)
+
+            return render_template('poem_page.html', poem=poem)
 
     @staticmethod
     def addPoem():

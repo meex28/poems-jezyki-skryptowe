@@ -7,6 +7,8 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
+    {% include "nav_bar.html" %}
+
     <h1>Wiersze {{ author }}</h1>
 
     {% for poem in poems %}

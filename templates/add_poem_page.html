@@ -7,6 +7,8 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
+    {% include "nav_bar.html" %}
+
     <form action="{{ url_for('addPoem') }}" method="post">
         <p>Autor</p>
         <input type="text" name="author">

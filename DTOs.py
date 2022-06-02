@@ -7,7 +7,8 @@ class PoemPreviewDTO:
 
 
 class PoemDTO:
-    def __init__(self, author, title, content, rating, opinions):
+    def __init__(self, id, author, title, content, rating, opinions):
+        self.id = id
         self.author = author
         self.title = title
         self.content = content
