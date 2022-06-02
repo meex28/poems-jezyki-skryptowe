@@ -12,6 +12,9 @@ def registerEndpoints(app):
     app.add_url_rule('/user/<string:author>', view_func=PoemsController.userAuthorPage, methods=['GET'])
     app.add_url_rule('/poem/<int:id>', view_func=PoemsController.poemPage, methods=['GET'])
     app.add_url_rule('/add', view_func=PoemsController.addPoem, methods=['GET', 'POST'])
+    app.add_url_rule('/daily', view_func=PoemsController.dailyPoem, methods=['GET'])
+    app.add_url_rule('/daily_personal', view_func=PoemsController.dailyPersonalPoem, methods=['GET'])
+    app.add_url_rule('/authors', view_func=PoemsController.authorsPage, methods=['GET'])
 
 
 class UsersController:
@@ -89,3 +92,19 @@ class PoemsController:
 
             # TODO: add message of result
             return redirect(url_for('addPoem'))
+
+    @staticmethod
+    def dailyPoem():
+        poem = PoemsController.__service.getDailyPoem()
+        return render_template('poem_page.html', poem=poem)
+
+    @staticmethod
+    def dailyPersonalPoem():
+        token = request.cookies.get('token')
+        poem = PoemsController.__service.getDailyPoem(token=token)
+        return render_template('poem_page.html', poem=poem)
+
+    @staticmethod
+    def authorsPage():
+        authors = PoemsController.__service.getAuthors()
+        return render_template('authors.html', authors=authors)

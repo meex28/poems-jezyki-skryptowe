@@ -34,3 +34,7 @@ def hashPassword(password, salt):
     salt = salt.encode()
 
     return hmac.new(password, salt, hashlib.sha256).hexdigest()
+
+
+def countAsciiSum(s):
+    return sum(map(ord, s))

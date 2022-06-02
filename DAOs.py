@@ -1,5 +1,6 @@
 from sqlalchemy.orm import sessionmaker
-from db import *
+from db import engine, User, Poem, Opinion, Token
+from sqlalchemy import func
 
 
 def mergeSessions(obj1, obj2):
@@ -15,6 +16,12 @@ def mergeSessions(obj1, obj2):
     else:
         session1.expunge(obj1)
         session2.add(obj1)
+
+
+def createOpinion(content, rating, author, poem):
+    mergeSessions(author, poem)
+    return Opinion(content, rating, author, poem)
+
 
 # base dao class, used for create, delete and get operations
 class DAO:
@@ -92,20 +99,42 @@ class PoemsDAO(DAO):
     def getPoemById(self, id):
         return super()._get(Poem, id)
 
+    # get poems of given author
     def getPoemsByAuthor(self, author):
         session = super()._createSession()
         result = session.query(Poem).filter(Poem.author == author, Poem.isUserAuthor == False).all()
         return result
 
+    # get poems of given user
     def getPoemsByUser(self, user):
         session = super()._createSession()
         result = session.query(Poem).filter(Poem.author == user, Poem.isUserAuthor == True).all()
         return result
 
+    # get most recent poem
     def getLastPoems(self, number):
         session = super()._createSession()
         result = session.query(Poem).order_by(-Poem.id).limit(number).all()
         return result
+
+    # count number of poems in DB
+    def countPoems(self):
+        session = super()._createSession()
+        number = session.query(Poem).count()
+        return number
+
+    # get ID of nth row in table
+    # index from 0
+    def getNthPoem(self, number):
+        session = super()._createSession()
+        result = session.query(Poem).limit(number+1).all()
+        return result[len(result)-1]
+
+    # get list of authors
+    def getAuthors(self):
+        session = super()._createSession()
+        authors = [(poem.author, poem.isUserAuthor) for poem in session.query(Poem).group_by(Poem.author).all()]
+        return authors
 
 
 class OpinionsDAO(DAO):
@@ -118,6 +147,6 @@ class OpinionsDAO(DAO):
 
     def getPoemOpinions(self, poem):
         session = super()._createSession()
-        opinions = session.query(Opinion).filter(Opinion.poem_id == poem.id).all()
+        opinions = session.query(Opinion).filter(Opinion.poem == poem).all()
         return opinions
 

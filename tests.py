@@ -58,6 +58,7 @@ def testAddingPoems():
     except ValueError:
         print("value error")
 
+
 def searchingPoems():
     dao = PoemsDAO()
 
@@ -72,11 +73,13 @@ def searchingPoems():
     for x in dao.getPoemsByAuthor('Konstanty Ildefons Gałczyński'):
         print(x)
 
+
 def getLastPoems():
     dao = PoemsDAO()
 
     for x in dao.getLastPoems(5):
         print(x)
+
 
 def testAddingOpinions():
     UsersService().createNewUser('orzel1', 'a')
@@ -92,9 +95,11 @@ def testAddingOpinions():
     opinion = Opinion(content='aaa', rating=2, poem=poem, user=user)
     opinionsDao.addOpinion(opinion)
 
+
 def delete():
     usersDao = UsersDAO()
     usersDao.deleteUserByLogin('orzel1')
+
 
 def addOpinions():
     usersDao = UsersDAO()
@@ -105,11 +110,11 @@ def addOpinions():
     poem = poemsDao.getPoemById(2)
 
     mergeSessions(user1, poem)
-    op1 = Opinion('a', 2, user1, poem)
+    op1 = createOpinion('a', 2, user1, poem)
     opinionsDao.addOpinion(op1)
 
     mergeSessions(user2, poem)
-    op2 = Opinion('b', 5, user2, poem)
+    op2 = createOpinion('b', 5, user2, poem)
     opinionsDao.addOpinion(op2)
 
     poem = poemsDao.getPoemById(2)
@@ -117,11 +122,23 @@ def addOpinions():
     for x in opinionsDao.getPoemOpinions(poem):
         print(x)
 
+
 def getPoem():
     service = PoemsService()
     poem = service.getPoem(1)
 
     print(poem)
+
+
+def dailyPoem():
+    service = PoemsService()
+    print(service.getDailyPoem())
+
+
+def testAuthorsList():
+    service = PoemsService()
+    print(service.getAuthors())
+
 
 if __name__ == '__main__':
     # testUsersDao()
@@ -135,4 +152,6 @@ if __name__ == '__main__':
     # delete()
     # addOpinions()
     # getPoem()
+    # dailyPoem()
+    testAuthorsList()
     pass

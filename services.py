@@ -2,7 +2,8 @@ from DAOs import *
 from utils import *
 from exceptions import *
 from DTOs import *
-
+from random import randint
+from datetime import date
 
 class UsersService:
     def __init__(self):
@@ -75,9 +76,7 @@ class PoemsService:
         if author == '' or content == '':
             raise ValueError('Wiersz musi posiadac autora i tresc!')
 
-        if chr(0) in title:
-            raise ValueError('Niepoprawny tytul.')
-        elif title == '':
+        if title == '':
             firstLine = content.split('\n')[0]
             title = f"*** ({firstLine})"
 
@@ -143,4 +142,31 @@ class PoemsService:
 
         return self._poemsToPoemsPreviewDTO(poems)
 
-    # def getPoemsByAuthor(self, author, isUserAuthor=False):
+    def getDailyPoem(self, token=None):
+        numberOfPoems = self.__poemsDAO.countPoems()
+        today = date.today()
+
+        poemNumber = countAsciiSum(str(today))
+
+        if token is not None:
+            login = decodeToken(token)[1]
+            poemNumber += countAsciiSum(str(login))
+
+        poemNumber %= numberOfPoems
+        poemId = self.__poemsDAO.getNthPoem(poemNumber).id
+
+        return self.getPoem(poemId)
+
+    def __parseAuthors(self, poem):
+        if not poem[1]:
+            poem = poem[0].replace(' ', '_'), poem[1]
+        return poem
+
+    # get list of authors
+    def getAuthors(self):
+        authors = self.__poemsDAO.getAuthors()
+
+        # check if author is user of service and parse name
+        authors = list(map(self.__parseAuthors, authors))
+
+        return authors
