@@ -9,11 +9,12 @@
 <body>
     <p>Lista autorów:</p>
     {% for author in authors %}
-        {% if author[1] %}
-            <a>Użytkownik: {{ author[0] }}</a>
+        {% if author.isUserAuthor %}
+            <a href={{ url_for('userAuthorPage', author=author.parsedName) }}>Użytkownik: {{ author.name }}</a>
         {% else %}
-            <a>{{ author[0] }}</a>
+            <a href={{ url_for('authorPage', author=author.parsedName) }}>{{ author.name }}</a>
         {% endif %}
+        <br>
     {% endfor %}
 </body>
 </html>

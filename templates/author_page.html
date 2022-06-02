@@ -11,7 +11,7 @@
 
     {% for poem in poems %}
         <p>{{ poem.author }}</p>
-        <h3>{{ poem.title }}</h3>
+        <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
         <br>
     {%  endfor %}
 </body>

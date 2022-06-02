@@ -108,7 +108,7 @@ class PoemsService:
 
     # create DTO objects to preview poems (contains id, author, title) from poem objects
     def _poemsToPoemsPreviewDTO(self, poems):
-        poemsDTO = [PoemPreviewDTO(f'poem/{poem.id}', poem.author, poem.title, None) for poem in poems]
+        poemsDTO = [PoemPreviewDTO(poem.id, poem.author, poem.title, None) for poem in poems]
         return poemsDTO
 
     # get username
@@ -157,16 +157,20 @@ class PoemsService:
 
         return self.getPoem(poemId)
 
-    def __parseAuthors(self, poem):
+    # get tupple of (authorName, isUserAuthor)
+
+    def __authorsToDTO(self, poem):
+        result = AuthorDTO(poem[0], poem[0], poem[1])
+
         if not poem[1]:
-            poem = poem[0].replace(' ', '_'), poem[1]
-        return poem
+            result.parsedName = poem[0].replace(' ', '_')
+        return result
 
     # get list of authors
     def getAuthors(self):
         authors = self.__poemsDAO.getAuthors()
 
         # check if author is user of service and parse name
-        authors = list(map(self.__parseAuthors, authors))
+        authors = list(map(self.__authorsToDTO, authors))
 
         return authors
