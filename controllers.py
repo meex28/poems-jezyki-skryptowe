@@ -18,6 +18,9 @@ def registerEndpoints(app):
     app.add_url_rule('/author', view_func=PoemsController.authorsPage, methods=['GET'])
     app.add_url_rule('/poem/<int:id>/opinion', view_func=PoemsController.addOpinion, methods=['GET', 'POST'])
     app.add_url_rule('/search', view_func=PoemsController.searchPoems, methods=['GET', 'POST'])
+    app.add_url_rule('/fav/add/<int:id>', view_func=PoemsController.addToFavourites, methods=['GET'])
+    app.add_url_rule('/fav/remove/<int:id>', view_func=PoemsController.removeFromFavourites, methods=['GET'])
+    app.add_url_rule('/fav', view_func=PoemsController.favouritePoems, methods=['GET'])
 
 
 class UsersController:
@@ -90,19 +93,23 @@ class PoemsController:
     def authorPage(author):
         # TODO: add exception handling
         author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
-        return render_template('author_page.html', poems=poems, author=author, logged=UsersController.checkToken(request))
+        return render_template('author_page.html', poems=poems, author=author,
+                               logged=UsersController.checkToken(request))
 
     @staticmethod
     def userAuthorPage(author):
         # TODO: add exception handling
         author, poems = PoemsController.__service.getUserPoemsPreviews(author)
-        return render_template('author_page.html', poems=poems, author=author, logged=UsersController.checkToken(request))
+        return render_template('author_page.html', poems=poems, author=author,
+                               logged=UsersController.checkToken(request))
 
     @staticmethod
     def poemPage(id):
         if request.method == 'GET':
             poem = PoemsController.__service.getPoem(id)
-            return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
+            token = request.cookies.get('token')
+            isFav = PoemsController.__service.isFavourite(token, id)
+            return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request), isFav=isFav)
 
     @staticmethod
     def addOpinion(id):
@@ -167,3 +174,33 @@ class PoemsController:
             title = request.form.get('title')
         poems = PoemsController.__service.searchPoem(title)
         return render_template('searching_page.html', poems=poems, logged=UsersController.checkToken(request))
+
+    @staticmethod
+    def addToFavourites(id):
+        token = request.cookies.get('token')
+
+        if token is None:
+            return redirect(url_for('login'))
+
+        PoemsController.__service.addToFavourites(token, id)
+        return redirect(url_for('poemPage', id=id))
+
+    @staticmethod
+    def removeFromFavourites(id):
+        token = request.cookies.get('token')
+
+        if token is None:
+            return redirect(url_for('login'))
+
+        PoemsController.__service.removeFromFavourites(token, id)
+        return redirect(url_for('poemPage', id=id))
+
+    @staticmethod
+    def favouritePoems():
+        token = request.cookies.get('token')
+
+        if token is None:
+            return redirect(url_for('login'))
+
+        poems = PoemsController.__service.getFavouritePoems(token)
+        return render_template('favourite_poems.html', poems=poems, logged=UsersController.checkToken(request))

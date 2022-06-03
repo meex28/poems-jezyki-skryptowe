@@ -1,8 +1,22 @@
-from sqlalchemy import create_engine, Column, String, Integer, Boolean, TEXT, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, Boolean, TEXT, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
+
+# storing favourite poems of users
+class Favourite(Base):
+    __tablename__ = 'favourites'
+    __table_args__ = (
+        PrimaryKeyConstraint('user_login', 'poem_id'),
+    )
+    user = Column('user_login', String(255), ForeignKey('users.login'))
+    poem = Column('poem_id', Integer, ForeignKey('poems.id'))
+
+    def __init__(self, user, poem):
+        self.user = user
+        self.poem = poem
 
 
 # storing users in database
@@ -13,6 +27,7 @@ class User(Base):
     __salt = Column('salt', String(255))
 
     opinions = relationship('Opinion', backref='user')
+    favourites = relationship('Poem', secondary='favourites', backref='fav_users')
 
     def __init__(self, login, password, salt):
         self.__login = login
@@ -104,6 +119,7 @@ class Opinion(Base):
 
     def __str__(self):
         return f'{self.id} : {self.author_login} : {self.poem_id} : {self.rating} : {self.content}'
+
 
 # creating mysql engine, and connect to DB
 engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')

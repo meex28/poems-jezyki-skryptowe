@@ -5,6 +5,7 @@
     <a href="{{ url_for('addPoem') }}">Dodaj wiersz</a>
     <a href="{{ url_for('dailyPoem') }}">Codzienny wiersz</a>
     <a href="{{ url_for('dailyPersonalPoem') }}">Twój codzienny wiersz</a>
+    <a href="{{ url_for('favouritePoems') }}">Ulubione</a>
     {% if logged == False %}
         <a href={{ url_for('login') }}>Zaloguj</a>
     {% else %}

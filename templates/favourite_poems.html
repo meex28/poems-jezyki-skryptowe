@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ulubione wiersze</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <div class="container">
+        <div class="item">
+            <h1>Twoje ulubione wiersze:</h1>
+        </div>
+
+        <div class="item">
+            {% include "poems_preview_list.html" %}
+        </div>
+    </div>
+</body>
+</html>

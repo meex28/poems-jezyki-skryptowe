@@ -1,6 +1,7 @@
 from sqlalchemy.orm import sessionmaker
-from db import engine, User, Poem, Opinion, Token
+from db import engine, User, Poem, Opinion, Token, Favourite
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 
 def mergeSessions(obj1, obj2):
@@ -21,7 +22,6 @@ def mergeSessions(obj1, obj2):
 def createOpinion(content, rating, author, poem):
     mergeSessions(author, poem)
     return Opinion(content, rating, author, poem)
-
 
 # base dao class, used for create, delete and get operations
 class DAO:
@@ -102,8 +102,16 @@ class PoemsDAO(DAO):
     def addPoem(self, poem):
         super()._add(poem)
 
+    # get one poem by id
     def getPoemById(self, id):
         return super()._get(Poem, id)
+
+    # get list of poems by given id
+    def getPoemsByIds(self, idList):
+        res = []
+        for idd in idList:
+            res.append(self.getPoemById(idd))
+        return res
 
     # get poems of given author
     def getPoemsByAuthor(self, author):
@@ -168,3 +176,23 @@ class OpinionsDAO(DAO):
         opinions = session.query(Opinion).filter(Opinion.poem == poem).all()
         return opinions
 
+    def addToFavourites(self, login, poemId):
+        fav = Favourite(login, poemId)
+        super()._add(fav)
+
+    def deleteFromFavourites(self, login, poemId):
+        fav = self.getFavouriteObject(login, poemId)
+        if fav is not None:
+            super()._delete(fav, session=DAO.Session.object_session(fav))
+
+    # return list of poems IDs
+    def getFavouritesOfUser(self, login):
+        session = super()._createSession()
+        favs = session.query(Favourite).filter(Favourite.user == login).all()
+        poems = [fav.poem for fav in favs]
+        return poems
+
+    def getFavouriteObject(self, login, poemId):
+        session = super()._createSession()
+        res = session.query(Favourite).filter(Favourite.user == login, Favourite.poem == poemId).first()
+        return res

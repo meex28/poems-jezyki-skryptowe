@@ -27,6 +27,14 @@
 
 <div class="container">
     <div class="item">
+        {% if isFav %}
+            <a href="{{ url_for('removeFromFavourites', id=poem.id) }}">Usuń utwór z ulubionych</a>
+        {% else %}
+            <a href="{{ url_for('addToFavourites', id=poem.id) }}">Dodaj utwór do ulubionych</a>
+        {% endif %}
+    </div>
+
+    <div class="item">
         <h1>Opinie</h1>
         <a href="{{ url_for('addOpinion', id=poem.id) }}">Dodaj własną opinię</a>
         <p>Średnia ocena: {{ poem.rating }} ★</p>

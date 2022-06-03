@@ -150,6 +150,15 @@ def testSearchingByTitleAndAuthor():
     res = dao.getPoemByAuthorAndTitle('List jeńca', 'a')
     print(res[0])
 
+def favaouritesDAO():
+    usersDao = UsersDAO()
+    poemsDao = PoemsDAO()
+    poem = poemsDao.getPoemById(65)
+    user = usersDao.getUserByLogin('asd')
+
+    OpinionsDAO().addToFavourites(user.login, poem.id)
+    OpinionsDAO().addToFavourites(user.login, poem.id)
+
 
 if __name__ == '__main__':
     # testUsersDao()
@@ -165,5 +174,6 @@ if __name__ == '__main__':
     # getPoem()
     # dailyPoem()
     # testAuthorsList()
-    testSearchingByTitleAndAuthor()
+    # testSearchingByTitleAndAuthor()
+    favaouritesDAO()
     pass

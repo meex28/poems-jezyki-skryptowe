@@ -225,3 +225,36 @@ class PoemsService:
         poemsDTO = self._poemsToPoemsPreviewDTO(poems)
 
         return poemsDTO
+
+    # return PoemsPreviewDTOs list with favourite poems of user
+    def getFavouritePoems(self, token):
+        login = decodeToken(token)[1]
+        poemsId = self.__opinionsDAO.getFavouritesOfUser(login)
+        poems = [self.__poemsDAO.getPoemById(poemId) for poemId in poemsId]
+        return self._poemsToPoemsPreviewDTO(poems)
+
+    # add to favourite poems of user
+    def addToFavourites(self, token, poemId):
+        login = decodeToken(token)[1]
+        try:
+            self.__opinionsDAO.addToFavourites(login, poemId)
+        except IntegrityError:
+            return False
+        return True
+
+    # delete from user's favourite poems
+    def removeFromFavourites(self, token, poemId):
+        login = decodeToken(token)[1]
+        try:
+            self.__opinionsDAO.deleteFromFavourites(login, poemId)
+        except Exception:
+            return False
+        return True
+
+    # check if given poem is user's favourite
+    def isFavourite(self, token, poemId):
+        if token is None:
+            return False
+        login = decodeToken(token)[1]
+        res = self.__opinionsDAO.getFavouriteObject(login, poemId)
+        return res is not None
