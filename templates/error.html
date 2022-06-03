@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Błąd</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+    {% include "nav_bar.html" %}
+
+    <div class="container">
+        <div class="item">
+            <h1>Wystąpił błąd!</h1>
+        </div>
+        <div class="item">
+            <h3>
+               {{ message }}
+            </h3>
+        </div>
+    </div>
+</body>
+</html>

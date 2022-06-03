@@ -14,16 +14,16 @@
             <h1>Autorzy:</h1>
         </div>
         {% for author in authors %}
-        {% if author.isUserAuthor %}
-            <div class="item">
-                <a href={{ url_for('userAuthorPage', author=author.parsedName) }}>👤 {{ author.name }}</a>
-            </div>
-        {% else %}
-            <div class="item">
-                <a href={{ url_for('authorPage', author=author.parsedName) }}>{{ author.name }}</a>
-            </div>
-        {% endif %}
-    {% endfor %}
+            {% if author.isUserAuthor %}
+                <div class="item">
+                    <a href={{ url_for('userAuthorPage', author=author.parsedName) }}>👤 {{ author.name }}</a>
+                </div>
+            {% else %}
+                <div class="item">
+                    <a href={{ url_for('authorPage', author=author.parsedName) }}>{{ author.name }}</a>
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </body>
 </html>

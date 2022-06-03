@@ -2,8 +2,8 @@ from DAOs import *
 from utils import *
 from exceptions import *
 from DTOs import *
-from random import randint
 from datetime import date
+
 
 class UsersService:
     def __init__(self):
@@ -14,16 +14,17 @@ class UsersService:
         user = self.__dao.getUserByLogin(login)
         return user is None
 
+    # create account for new user
     def createNewUser(self, login, password):
         if not self.isLoginAvailable(login):
-            raise ValueError("Login is already used")
+            raise ValueError("Login jest już zajęty.")
 
         # prepare password and save user in DB
         salt = generateSalt()
         password = hashPassword(password, salt)
         user = User(login, password, salt)
 
-        # TODO: add exceptions
+        # save user in DB
         self.__dao.addUser(user)
 
         return True
@@ -32,7 +33,7 @@ class UsersService:
     def login(self, login, password):
         # check password
         if not self.isPasswordCorrect(login, password):
-            raise Unauthorized("Incorrect login or password")
+            raise Unauthorized("Niepoprawny login lub hasło.")
 
         # generate and save token
         token = generateToken(login)
@@ -41,6 +42,7 @@ class UsersService:
 
         return token
 
+    # in logout delete token from DB
     def logout(self, token):
         self.__dao.deleteToken(token)
         return True
@@ -78,10 +80,13 @@ class PoemsService:
         self.__opinionsDAO = OpinionsDAO()
         self.__usersDAO = UsersDAO()
 
+    # add new poem
     def addPoem(self, author, title, content, isUserAuthor=False):
+        # make validation
         if author == '' or content == '':
-            raise ValueError('Wiersz musi posiadac autora i tresc!')
+            raise ValueError('Wiersz musi posiadać autora i treść.')
 
+        # if title is empty use given pattern: "*** ({first line in poem})"
         if title == '':
             firstLine = content.split('\n')[0]
             title = f"*** ({firstLine})"
@@ -199,4 +204,3 @@ class PoemsService:
         self.__opinionsDAO.addOpinion(opinion)
 
         return True
-

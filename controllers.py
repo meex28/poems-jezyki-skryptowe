@@ -40,7 +40,7 @@ class UsersController:
                     resp.set_cookie('token', token)
                     return resp
                 except Unauthorized as e:
-                    return e.message
+                    return UsersController.error(str(e), request)
             elif request.form.get('submit') == 'register':
                 return redirect(url_for('register', logged=UsersController.checkToken(request)))
 
@@ -65,8 +65,16 @@ class UsersController:
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
             elif request.form.get('submit') == 'register':
                 user, password = request.form.get('login'), request.form.get('password')
-                UsersController.__service.createNewUser(user, password)
+                try:
+                    UsersController.__service.createNewUser(user, password)
+                except ValueError as e:
+                    return UsersController.error(str(e), request)
+
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
+
+    @staticmethod
+    def error(message, r):
+        return render_template('error.html', message=message, logged=UsersController.checkToken(r))
 
 
 class PoemsController:
@@ -120,9 +128,11 @@ class PoemsController:
             isUserAuthor = request.form.get('isUserAuthor') == 'on'
             title = request.form.get('title')
             content = request.form.get('content')
-            PoemsController.__service.addPoem(author, title, content, isUserAuthor)
+            try:
+                PoemsController.__service.addPoem(author, title, content, isUserAuthor)
+            except ValueError as e:
+                return UsersController.error(str(e), request)
 
-            # TODO: add message of result
             return redirect(url_for('addPoem', logged=UsersController.checkToken(request)))
 
     @staticmethod
