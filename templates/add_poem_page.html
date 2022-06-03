@@ -9,17 +9,31 @@
 <body>
     {% include "nav_bar.html" %}
 
-    <form action="{{ url_for('addPoem') }}" method="post">
-        <p>Autor</p>
-        <input type="text" name="author">
-        <p>Czy wiersz jest autorski?</p>
-        <input type="checkbox" name="isUserAuthor">
-        <p>Tytuł</p>
-        <input type="text" name="title">
-        <p>Treść utworu</p>
-        <input type="text" name="content">
 
-        <button type="submit">Dodaj</button>
+    <form class="container add-poem" action="{{ url_for('addPoem') }}" method="post" id="add-form">
+        <div class="item">
+            <h1>Dodaj utwór</h1>
+        </div>
+        <div class="item">
+            <input type="text" name="author" placeholder="Autor">
+        </div>
+        <div class="item">
+            <label for="is-user-author">Wiersz autorski</label>
+            <input type="checkbox" name="isUserAuthor" id="is-user-author">
+        </div>
+        <div class="item">
+            <input type="text" name="title" placeholder="Tytuł">
+        </div>
+        <div class="item">
+            Treść utworu
+        </div>
+        <div class="item">
+           <textarea type="text" name="content" form="add-form">
+            </textarea>
+        </div>
+        <div class="item">
+            <button class="item" type="submit">Dodaj</button>
+        </div>
     </form>
 </body>
 </html>

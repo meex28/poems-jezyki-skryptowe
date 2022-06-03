@@ -6,6 +6,7 @@ from flask import render_template, request, make_response, redirect, url_for
 # registering endpoints from controllers with methods
 def registerEndpoints(app):
     app.add_url_rule('/login', view_func=UsersController.login, methods=["POST", "GET"])
+    app.add_url_rule('/logout', view_func=UsersController.logout, methods=["GET"])
     app.add_url_rule('/register', view_func=UsersController.register, methods=["POST", "GET"])
     app.add_url_rule('/', view_func=PoemsController.mainPage, methods=['GET'])
     app.add_url_rule('/author/<string:author>', view_func=PoemsController.authorPage, methods=['GET'])
@@ -15,43 +16,57 @@ def registerEndpoints(app):
     app.add_url_rule('/daily', view_func=PoemsController.dailyPoem, methods=['GET'])
     app.add_url_rule('/daily_personal', view_func=PoemsController.dailyPersonalPoem, methods=['GET'])
     app.add_url_rule('/author', view_func=PoemsController.authorsPage, methods=['GET'])
+    app.add_url_rule('/poem/<int:id>/opinion', view_func=PoemsController.addOpinion, methods=['GET', 'POST'])
 
 
 class UsersController:
     __service = UsersService()
 
     @staticmethod
+    def checkToken(r):
+        token = r.cookies.get('token')
+        return UsersController.__service.checkToken(token)[0]
+
+    @staticmethod
     def login():
         if request.method == 'GET':
-            return render_template('login.html')
+            return render_template('login.html', logged=UsersController.checkToken(request))
         elif request.method == 'POST':
-            print(request.form)
-
             if request.form.get('submit') == 'login':
                 user, password = request.form.get('login'), request.form.get('password')
                 try:
                     token = UsersController.__service.login(user, password)
-                    resp = make_response(redirect(url_for('mainPage')))
+                    resp = make_response(redirect(url_for('mainPage', logged=UsersController.checkToken(request))))
                     resp.set_cookie('token', token)
                     return resp
                 except Unauthorized as e:
                     return e.message
             elif request.form.get('submit') == 'register':
-                return redirect(url_for('register'))
+                return redirect(url_for('register', logged=UsersController.checkToken(request)))
+
+    @staticmethod
+    def logout():
+        if request.method == 'GET':
+            token = request.cookies.get('token')
+            if token is None:
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
+
+            UsersController.__service.logout(token)
+            resp = make_response(redirect(url_for('mainPage', logged=False)))
+            resp.delete_cookie('token')
+            return resp
 
     @staticmethod
     def register():
         if request.method == 'GET':
-            return render_template('register.html')
+            return render_template('register.html', logged=UsersController.checkToken(request))
         elif request.method == 'POST':
-            print(request.form)
-
             if request.form.get('submit') == 'login':
-                return redirect(url_for('login'))
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
             elif request.form.get('submit') == 'register':
                 user, password = request.form.get('login'), request.form.get('password')
                 UsersController.__service.createNewUser(user, password)
-                return redirect(url_for('login'))
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
 
 
 class PoemsController:
@@ -60,39 +75,46 @@ class PoemsController:
     @staticmethod
     def mainPage():
         poems = PoemsController.__service.getMainPagePoems()
-        return render_template('index.html', poems=poems)
+        return render_template('index.html', poems=poems, logged=UsersController.checkToken(request))
 
     @staticmethod
     def authorPage(author):
         # TODO: add exception handling
         author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
-        return render_template('author_page.html', poems=poems, author=author)
+        return render_template('author_page.html', poems=poems, author=author, logged=UsersController.checkToken(request))
 
     @staticmethod
     def userAuthorPage(author):
         # TODO: add exception handling
         author, poems = PoemsController.__service.getUserPoemsPreviews(author)
-        return render_template('author_page.html', poems=poems, author=author)
+        return render_template('author_page.html', poems=poems, author=author, logged=UsersController.checkToken(request))
 
     @staticmethod
     def poemPage(id):
         if request.method == 'GET':
             poem = PoemsController.__service.getPoem(id)
-            return render_template('poem_page.html', poem=poem)
+            return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
+
+    @staticmethod
+    def addOpinion(id):
+        if request.method == 'GET':
+            return render_template('add_opinion_page.html', id=id, logged=UsersController.checkToken(request))
         elif request.method == 'POST':
             if request.cookies.get('token') is None:
-                return redirect(url_for('login'))
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
 
             PoemsController.__service.addOpinion(id, request.cookies.get('token'),
                                                  request.form.get('content'), request.form.get('rating'))
             poem = PoemsController.__service.getPoem(id)
 
-            return render_template('poem_page.html', poem=poem)
+            return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
 
     @staticmethod
     def addPoem():
         if request.method == 'GET':
-            return render_template('add_poem_page.html')
+            if not UsersController.checkToken(request):
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
+            return render_template('add_poem_page.html', logged=UsersController.checkToken(request))
         elif request.method == 'POST':
             author = request.form.get('author')
             isUserAuthor = request.form.get('isUserAuthor') == 'on'
@@ -101,20 +123,24 @@ class PoemsController:
             PoemsController.__service.addPoem(author, title, content, isUserAuthor)
 
             # TODO: add message of result
-            return redirect(url_for('addPoem'))
+            return redirect(url_for('addPoem', logged=UsersController.checkToken(request)))
 
     @staticmethod
     def dailyPoem():
         poem = PoemsController.__service.getDailyPoem()
-        return render_template('poem_page.html', poem=poem)
+        return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
 
     @staticmethod
     def dailyPersonalPoem():
         token = request.cookies.get('token')
+
+        if token is None:
+            return redirect(url_for('login'))
+
         poem = PoemsController.__service.getDailyPoem(token=token)
-        return render_template('poem_page.html', poem=poem)
+        return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
 
     @staticmethod
     def authorsPage():
         authors = PoemsController.__service.getAuthors()
-        return render_template('authors.html', authors=authors)
+        return render_template('authors.html', authors=authors, logged=UsersController.checkToken(request))

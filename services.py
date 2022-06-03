@@ -41,6 +41,10 @@ class UsersService:
 
         return token
 
+    def logout(self, token):
+        self.__dao.deleteToken(token)
+        return True
+
     # check if given password is correct for given account
     def isPasswordCorrect(self, login, password):
         user = self.__dao.getUserByLogin(login)
@@ -56,7 +60,8 @@ class UsersService:
     # return (boolean, string) : (is token valid, login)
     def checkToken(self, token):
         # token is Token object
-        token = self.__dao.getToken(token)
+        if token is not None:
+            token = self.__dao.getToken(token)
 
         isTokenValid = token is not None
         user = None
@@ -81,7 +86,7 @@ class PoemsService:
             firstLine = content.split('\n')[0]
             title = f"*** ({firstLine})"
 
-        poem = Poem(author, title, content, isUserAuthor)
+        poem = Poem(author, title, content.strip(), isUserAuthor)
 
         try:
             self.__poemsDAO.addPoem(poem)
@@ -102,8 +107,10 @@ class PoemsService:
             ratingAvg += opinion.rating
         if len(opinionsDTO) != 0:
             ratingAvg /= len(opinionsDTO)
+            # round to 2 digits
+            ratingAvg = int(ratingAvg * 100) / 100
 
-        poemDTO = PoemDTO(id, poem.author, poem.title, poem.content, ratingAvg, opinionsDTO)
+        poemDTO = PoemDTO(id, poem.author, poem.title, poem.content.split('\n'), ratingAvg, opinionsDTO)
 
         return poemDTO
 

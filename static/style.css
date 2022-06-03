@@ -123,3 +123,140 @@ body {
 .login-form .register_action button:nth-child(1):hover {
   background: #3c4d6d;
 }
+
+/*Nav bar*/
+.nav-bar {
+  background: #fff;
+  width: 950px;
+  display: -webkit-box;
+  display: flex;
+  margin: 0px auto;
+  flex-direction: row;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 25px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+}
+
+.nav-bar a {
+  margin: 10px;
+  text-decoration: none;
+}
+
+/* container class */
+.container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #fff;
+  margin: 65px auto;
+  width: 500px;
+  border-radius: 4px;
+  box-shadow: 0 2px 25px rgba(0, 0, 0, 0.2);
+}
+
+.item {
+  margin: 10px auto;
+  text-align: center;
+}
+
+.item:first-child {
+  margin-top: 25px;
+}
+
+.item:last-child {
+  margin-bottom: 25px;
+}
+
+.item a{
+  text-decoration: none;
+  font-size: 20px;
+}
+
+.item h1{
+  font-weight: 300;
+}
+
+.item h3{
+  font-weight: 300;
+}
+
+.item button {
+  width: 100%;
+  border: none;
+  padding: 18px;
+  font-family: 'Rubik', sans-serif;
+  cursor: pointer;
+  text-transform: uppercase;
+  background: #e8e9ec;
+  color: #777;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 0;
+  letter-spacing: 0.2px;
+  outline: 0;
+  -webkit-transition: all .3s;
+  transition: all .3s;
+}
+.item button:hover {
+  background: #d8d8d8;
+}
+
+.add-poem input {
+  font-size: 16px;
+  display: block;
+  font-family: 'Rubik', sans-serif;
+  width: 100%;
+  padding: 10px 1px;
+  border: 0;
+  border-bottom: 1px solid #747474;
+  outline: none;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  text-align: center;
+}
+.add-poem textarea{
+  font-size: 16px;
+  display: block;
+  font-family: 'Rubik', sans-serif;
+  padding: 10px 20px;
+  height: 200px;
+  width: 400px;
+  border: 1px solid #747474;
+  outline: none;
+  resize: none;
+  text-align: left;
+  vertical-align: top;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:visited{
+    color:black;
+}
+
+.rating{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.rating input{
+  width: 10%;
+  padding: 1px;
+  margin-left: 10px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  text-align: center;
+}
+
+input[type=number] {
+  text-align: center;
+  -moz-appearance: textfield;
+}

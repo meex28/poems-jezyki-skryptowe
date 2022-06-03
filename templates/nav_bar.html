@@ -1,7 +1,13 @@
-<div class="nav_bar">
+<div class="nav-bar">
     <a href={{ url_for('mainPage') }}>Strona główna</a>
     <a href={{ url_for('authorsPage') }}>Autorzy</a>
     <a>Wyszukiwanie</a>
     <a href="{{ url_for('addPoem') }}">Dodaj wiersz</a>
-    <a href={{ url_for('login') }}>Login</a>
+    <a href="{{ url_for('dailyPoem') }}">Codzienny wiersz</a>
+    <a href="{{ url_for('dailyPersonalPoem') }}">Twój codzienny wiersz</a>
+    {% if logged == False %}
+        <a href={{ url_for('login') }}>Zaloguj</a>
+    {% else %}
+        <a href={{ url_for('logout') }}>Wyloguj</a>
+    {% endif %}
 </div>

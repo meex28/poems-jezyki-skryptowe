@@ -4,29 +4,42 @@
     <meta charset="UTF-8">
     <title>{{ poem.title }}</title>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
-    {% include "nav_bar.html" %}
+{% include "nav_bar.html" %}
 
-    <p>{{ poem.author }}</p>
-    <p>{{ poem.title }}</p>
-    <p>{{ poem.content }}</p>
+<div class="container">
+    <div class="item">
+        <h3>{{ poem.author }}</h3>
+    </div>
+    <div class="item">
+        <h1>{{ poem.title }}</h1>
+    </div>
+    <div class="item">
+        <p>
+        {% for line in poem.content %}
+            {{ line }}<br>
+        {% endfor %}
+        </p>
+    </div>
+</div>
 
-    <p>Średnia ocena: {{ poem.rating }}</p>
-    <p>Opinie:</p>
+<div class="container">
+    <div class="item">
+        <h1>Opinie</h1>
+        <a href="{{ url_for('addOpinion', id=poem.id) }}">Dodaj własną opinię</a>
+        <p>Średnia ocena: {{ poem.rating }} ★</p>
+    </div>
+
     {% for opinion in poem.opinions %}
-        <p>Autor: {{ opinion.author }} | Ocena: {{ opinion.rating }}</p>
-        <p>{{ opinion.content }}</p>
+        <div class="item">
+            <p>Autor: {{ opinion.author }} | {{ opinion.rating }} ★</p>
+            <p>{{ opinion.content }}</p>
+        </div>
     {% endfor %}
+</div>
 
-    <p>Dodaj opinie:</p>
-    <form action="{{ url_for('poemPage', id=poem.id) }}" method="post">
-        <p>Recenzja:</p>
-        <input type="text" name="content">
-        <p>Ocena (od 1 do 5):</p>
-        <input type="number" name="rating">
-        <button type="submit">Dodaj</button>
-    </form>
+
 </body>
 </html>

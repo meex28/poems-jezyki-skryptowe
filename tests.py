@@ -139,6 +139,10 @@ def testAuthorsList():
     service = PoemsService()
     print(service.getAuthors())
 
+def xx():
+    dao = PoemsDAO()
+    poem = dao.getPoemById(58)
+    print(poem.content)
 
 if __name__ == '__main__':
     # testUsersDao()
@@ -153,5 +157,6 @@ if __name__ == '__main__':
     # addOpinions()
     # getPoem()
     # dailyPoem()
-    testAuthorsList()
+    # testAuthorsList()
+    xx()
     pass

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj opinię</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+{% include "nav_bar.html" %}
+
+
+    <form class="container add-poem add-opinion" action="{{ url_for('addOpinion', id=id) }}" method="post" id="add-opinion">
+      <div class="item">
+       <h1>Dodaj opinię</h1>
+    </div>
+      <div class="item ">
+        Recenzja:
+    </div>
+      <div class="item">
+        <textarea type="text" name="content" form="add-opinion">            </textarea>
+      </div>
+      <div class="item rating">
+        <p>Ocena (od 1 do 5):</p>
+        <input type="number" min="1" max="5" name="rating">
+    </div>
+      <div class="item">
+        <button class="item" type="submit">Dodaj</button>
+    </div>
+    </form>
+
+
+</body>
+</html>

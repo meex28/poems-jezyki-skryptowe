@@ -7,16 +7,26 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='style.css') }}">
 </head>
 <body>
-    {% include "nav_bar.html" %}
+{% include "nav_bar.html" %}
 
-    <h1>Main page</h1>
+<div class="container">
+    <div class="item">
+        <h1>Codzienna poezja</h1>
+    </div>
 
-    <p>Poems here</p>
+    <div class="item">
+        <h3>Sprawdź nasze najnowsze wiersze!</h3>
+    </div>
 
-    {% for poem in poems %}
-        <p>{{ poem.author }}</p>
-        <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
-        <br>
-    {%  endfor %}
+    <div class="item">
+        {% for poem in poems %}
+            <p>{{ poem.author }}</p>
+            <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
+            <br>
+            <br>
+        {% endfor %}
+    </div>
+</div>
+
 </body>
 </html>

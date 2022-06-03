@@ -91,6 +91,12 @@ class UsersDAO(DAO):
     def addToken(self, token):
         super()._add(token)
 
+    def deleteToken(self, token):
+        session = super()._createSession()
+        token = super()._get(Token, token, session=session)
+        if token is not None:
+            super()._delete(token, session=session)
+
 
 class PoemsDAO(DAO):
     def addPoem(self, poem):

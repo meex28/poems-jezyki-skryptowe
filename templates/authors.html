@@ -9,14 +9,21 @@
 <body>
     {% include "nav_bar.html" %}
 
-    <p>Lista autorów:</p>
-    {% for author in authors %}
+    <div class="container">
+        <div class="item">
+            <h1>Autorzy:</h1>
+        </div>
+        {% for author in authors %}
         {% if author.isUserAuthor %}
-            <a href={{ url_for('userAuthorPage', author=author.parsedName) }}>Użytkownik: {{ author.name }}</a>
+            <div class="item">
+                <a href={{ url_for('userAuthorPage', author=author.parsedName) }}>👤 {{ author.name }}</a>
+            </div>
         {% else %}
-            <a href={{ url_for('authorPage', author=author.parsedName) }}>{{ author.name }}</a>
+            <div class="item">
+                <a href={{ url_for('authorPage', author=author.parsedName) }}>{{ author.name }}</a>
+            </div>
         {% endif %}
-        <br>
     {% endfor %}
+    </div>
 </body>
 </html>

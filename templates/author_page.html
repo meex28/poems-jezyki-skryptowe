@@ -9,12 +9,18 @@
 <body>
     {% include "nav_bar.html" %}
 
-    <h1>Wiersze {{ author }}</h1>
+    <div class="container">
+        <div class="item">
+            <h1>Wiersze <br>{{  author }}</h1>
+        </div>
 
-    {% for poem in poems %}
-        <p>{{ poem.author }}</p>
-        <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
-        <br>
-    {%  endfor %}
+        {% for poem in poems %}
+        <div class="item">
+            <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
+        </div>
+        {%  endfor %}
+    </div>
+
+
 </body>
 </html>
