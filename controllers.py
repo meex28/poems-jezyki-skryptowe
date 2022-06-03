@@ -17,6 +17,7 @@ def registerEndpoints(app):
     app.add_url_rule('/daily_personal', view_func=PoemsController.dailyPersonalPoem, methods=['GET'])
     app.add_url_rule('/author', view_func=PoemsController.authorsPage, methods=['GET'])
     app.add_url_rule('/poem/<int:id>/opinion', view_func=PoemsController.addOpinion, methods=['GET', 'POST'])
+    app.add_url_rule('/search', view_func=PoemsController.searchPoems, methods=['GET', 'POST'])
 
 
 class UsersController:
@@ -124,12 +125,14 @@ class PoemsController:
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
             return render_template('add_poem_page.html', logged=UsersController.checkToken(request))
         elif request.method == 'POST':
+            if not UsersController.checkToken(request):
+                return redirect(url_for('login', logged=UsersController.checkToken(request)))
             author = request.form.get('author')
             isUserAuthor = request.form.get('isUserAuthor') == 'on'
             title = request.form.get('title')
             content = request.form.get('content')
             try:
-                PoemsController.__service.addPoem(author, title, content, isUserAuthor)
+                PoemsController.__service.addPoem(request.cookies.get('token'), author, title, content, isUserAuthor)
             except ValueError as e:
                 return UsersController.error(str(e), request)
 
@@ -154,3 +157,13 @@ class PoemsController:
     def authorsPage():
         authors = PoemsController.__service.getAuthors()
         return render_template('authors.html', authors=authors, logged=UsersController.checkToken(request))
+
+    @staticmethod
+    def searchPoems():
+        title = ''
+        if request.method == 'GET':
+            title = ''
+        elif request.method == 'POST':
+            title = request.form.get('title')
+        poems = PoemsController.__service.searchPoem(title)
+        return render_template('searching_page.html', poems=poems, logged=UsersController.checkToken(request))

@@ -139,10 +139,17 @@ def testAuthorsList():
     service = PoemsService()
     print(service.getAuthors())
 
-def xx():
+
+def testSearchingByTitleAndAuthor():
     dao = PoemsDAO()
-    poem = dao.getPoemById(58)
-    print(poem.content)
+    # res = dao.searchByTitle('je', 10)
+    # print(res)
+    # for x in res:
+    #     print(x)
+
+    res = dao.getPoemByAuthorAndTitle('List jeńca', 'a')
+    print(res[0])
+
 
 if __name__ == '__main__':
     # testUsersDao()
@@ -158,5 +165,5 @@ if __name__ == '__main__':
     # getPoem()
     # dailyPoem()
     # testAuthorsList()
-    xx()
+    testSearchingByTitleAndAuthor()
     pass

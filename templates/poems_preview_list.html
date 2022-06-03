@@ -1,0 +1,11 @@
+{% if poems %}
+    {% for poem in poems %}
+        <p>{{ poem.author }}</p>
+        <a href={{ url_for('poemPage', id=poem.id) }}>{{ poem.title }}</a>
+        <br>
+        <br>
+    {% endfor %}
+{% else %}
+    <p>Brak wierszy</p>
+    <br>
+{% endif %}

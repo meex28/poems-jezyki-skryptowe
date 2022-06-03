@@ -10,7 +10,8 @@
 {% include "nav_bar.html" %}
 
 
-    <form class="container add-poem add-opinion" action="{{ url_for('addOpinion', id=id) }}" method="post" id="add-opinion">
+    <form class="container add-poem add-opinion" action="{{ url_for('addOpinion', id=id) }}" method="post"
+          id="add-opinion" autocomplete="off">
       <div class="item">
        <h1>Dodaj opinię</h1>
     </div>

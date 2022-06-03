@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wyszukaj</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Rubik:400,700'>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+</head>
+<body>
+    {% include "nav_bar.html" %}
+
+    <div class="container">
+        <div class="item">
+            <h1>Wyszukiwanie po tytule</h1>
+        </div>
+        <form class="item search" action="{{ url_for('searchPoems') }}" method="post" autocomplete="off">
+            <input type="text" placeholder="Tytuł" name="title">
+            <button class="item" type="submit">Wyszukaj</button>
+        </form>
+
+        <div class="item">
+            {% include "poems_preview_list.html" %}
+        </div>
+    </div>
+</body>
+</html>

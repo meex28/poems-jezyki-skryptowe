@@ -81,9 +81,9 @@ class PoemsService:
         self.__usersDAO = UsersDAO()
 
     # add new poem
-    def addPoem(self, author, title, content, isUserAuthor=False):
+    def addPoem(self, token, author, title, content, isUserAuthor=False):
         # make validation
-        if author == '' or content == '':
+        if (author == '' and isUserAuthor is False) or content == '':
             raise ValueError('Wiersz musi posiadać autora i treść.')
 
         # if title is empty use given pattern: "*** ({first line in poem})"
@@ -91,15 +91,23 @@ class PoemsService:
             firstLine = content.split('\n')[0]
             title = f"*** ({firstLine})"
 
+        # if user is an author then set his login as author
+        if isUserAuthor:
+            author = decodeToken(token)[1]
+
+        if self.__poemsDAO.getPoemByAuthorAndTitle(title, author) is not None:
+            raise ValueError('Wiersz o takim tytule i autorze już występuje w bazie.')
+
         poem = Poem(author, title, content.strip(), isUserAuthor)
 
         try:
             self.__poemsDAO.addPoem(poem)
-        except:
+        except Exception:
             raise InternalServerError('Database error.')
 
         return True
 
+    # get poem by id
     def getPoem(self, id):
         poem = self.__poemsDAO.getPoemById(id)
         opinions = self.__opinionsDAO.getPoemOpinions(poem)
@@ -115,6 +123,7 @@ class PoemsService:
             # round to 2 digits
             ratingAvg = int(ratingAvg * 100) / 100
 
+        # create DTO object
         poemDTO = PoemDTO(id, poem.author, poem.title, poem.content.split('\n'), ratingAvg, opinionsDTO)
 
         return poemDTO
@@ -149,6 +158,7 @@ class PoemsService:
 
         return author, self._poemsToPoemsPreviewDTO(poems)
 
+    # return 5 most recent poems for main page view
     def getMainPagePoems(self):
         poems = self.__poemsDAO.getLastPoems(5)
         # TODO: pass opinions in constructor
@@ -204,3 +214,14 @@ class PoemsService:
         self.__opinionsDAO.addOpinion(opinion)
 
         return True
+
+    # return list of PoemPreviewDTO, where titles contains given title (get first 10 results)
+    # using SQL "LIKE %title%"
+    def searchPoem(self, title):
+        # search poems
+        poems = self.__poemsDAO.searchByTitle(title, 10)
+
+        # transfer poems to DTO
+        poemsDTO = self._poemsToPoemsPreviewDTO(poems)
+
+        return poemsDTO

@@ -142,6 +142,18 @@ class PoemsDAO(DAO):
         authors = [(poem.author, poem.isUserAuthor) for poem in session.query(Poem).group_by(Poem.author).all()]
         return authors
 
+    # search poems by title, using SQL "LIKE %title%"
+    # limited to {limit} first results
+    def searchByTitle(self, title, limit):
+        session = super()._createSession()
+        poems = session.query(Poem).filter(Poem.title.like(f'%{title}%')).limit(limit).all()
+        return poems
+
+    def getPoemByAuthorAndTitle(self, title, author):
+        session = super()._createSession()
+        poem = session.query(Poem).filter(Poem.title == title, Poem.author == author).first()
+        return poem
+
 
 class OpinionsDAO(DAO):
     # get session from opinion's author (user)
