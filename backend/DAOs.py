@@ -23,11 +23,15 @@ def createOpinion(content, rating, author, poem):
 
 # base dao class, used for create, delete and get operations
 class DAO:
+    current_session = None
     Session = sessionmaker(bind=engine)
 
     def _createSession(self):
-        session = DAO.Session()
-        return session
+        if DAO.current_session is None:
+            DAO.current_session = DAO.Session()
+
+        # session = DAO.Session()
+        return DAO.current_session
 
     def _add(self, value, session=None):
         if session is None:
