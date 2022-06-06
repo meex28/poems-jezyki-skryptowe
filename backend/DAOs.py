@@ -198,7 +198,8 @@ class OpinionsDAO(DAO):
     def addOpinion(self, opinion):
         session = DAO.Session.object_session(opinion.user)
         super()._add(opinion, session=session)
-        session.close()
+        if session is not None:
+            session.close()
 
     # get opinions for given poem
     def getPoemOpinions(self, poem):
