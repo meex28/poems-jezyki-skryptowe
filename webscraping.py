@@ -4,7 +4,7 @@ from services import PoemsService, UsersService
 
 # webscraping z strony wywrota.pl i poezja.org
 
-file = open('links_to_poems').read()
+file = open('data/links_to_poems').read()
 links = file.split('\n')
 
 service = PoemsService()
