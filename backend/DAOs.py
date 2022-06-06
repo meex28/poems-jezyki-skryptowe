@@ -30,18 +30,26 @@ class DAO:
         return session
 
     def _add(self, value, session=None):
+        flag = session is None
         if session is None:
             session = self._createSession()
 
         session.add(value)
         session.commit()
 
+        if flag:
+            session.close()
+
     def _delete(self, value, session=None):
+        flag = session is None
         if session is None:
             session = self._createSession()
 
         session.delete(value)
         session.commit()
+
+        if flag:
+            session.close()
 
     # get record from given table by given key
     def _get(self, type, key, session=None):
@@ -56,6 +64,9 @@ class DAO:
         if not flag:
             session.commit()
 
+        if flag:
+            session.close()
+
         return result
 
 
@@ -68,6 +79,7 @@ class UsersDAO(DAO):
 
         # delete user opinions
         opinions = session.query(Opinion).filter(Opinion.author_login == None).delete()
+        session.close()
 
     # get User object with given login
     def getUserByLogin(self, login):
@@ -86,6 +98,7 @@ class UsersDAO(DAO):
         user.password = newPassword
         session.flush()
         session.commit()
+        session.close()
 
     # add new User
     def addUser(self, user):
@@ -101,6 +114,7 @@ class UsersDAO(DAO):
         token = super()._get(Token, token, session=session)
         if token is not None:
             super()._delete(token, session=session)
+        session.close()
 
 
 class PoemsDAO(DAO):
@@ -123,24 +137,28 @@ class PoemsDAO(DAO):
     def getPoemsByAuthor(self, author):
         session = super()._createSession()
         result = session.query(Poem).filter(Poem.author == author, Poem.isUserAuthor == False).all()
+        session.close()
         return result
 
     # get poems of given user
     def getPoemsByUser(self, user):
         session = super()._createSession()
         result = session.query(Poem).filter(Poem.author == user, Poem.isUserAuthor == True).all()
+        session.close()
         return result
 
     # get most recent poem
     def getLastPoems(self, number):
         session = super()._createSession()
         result = session.query(Poem).order_by(-Poem.id).limit(number).all()
+        session.close()
         return result
 
     # count number of poems in DB
     def countPoems(self):
         session = super()._createSession()
         number = session.query(Poem).count()
+        session.close()
         return number
 
     # get ID of nth row in table
@@ -148,12 +166,14 @@ class PoemsDAO(DAO):
     def getNthPoem(self, number):
         session = super()._createSession()
         result = session.query(Poem).limit(number+1).all()
+        session.close()
         return result[len(result)-1]
 
     # get list of authors
     def getAuthors(self):
         session = super()._createSession()
         authors = [(poem.author, poem.isUserAuthor) for poem in session.query(Poem).group_by(Poem.author).all()]
+        session.close()
         return authors
 
     # search poems by title, using SQL "LIKE %title%"
@@ -161,12 +181,14 @@ class PoemsDAO(DAO):
     def searchByTitle(self, title, limit):
         session = super()._createSession()
         poems = session.query(Poem).filter(Poem.title.like(f'%{title}%')).limit(limit).all()
+        session.close()
         return poems
 
     # get Poem with given author and title
     def getPoemByAuthorAndTitle(self, title, author):
         session = super()._createSession()
         poem = session.query(Poem).filter(Poem.title == title, Poem.author == author).first()
+        session.close()
         return poem
 
 
@@ -176,11 +198,13 @@ class OpinionsDAO(DAO):
     def addOpinion(self, opinion):
         session = DAO.Session.object_session(opinion.user)
         super()._add(opinion, session=session)
+        session.close()
 
     # get opinions for given poem
     def getPoemOpinions(self, poem):
         session = super()._createSession()
         opinions = session.query(Opinion).filter(Opinion.poem == poem).all()
+        session.close()
         return opinions
 
     # add poem to user's favourites
@@ -194,15 +218,18 @@ class OpinionsDAO(DAO):
         if fav is not None:
             super()._delete(fav, session=DAO.Session.object_session(fav))
 
+
     # return list of poems IDs
     def getFavouritesOfUser(self, login):
         session = super()._createSession()
         favs = session.query(Favourite).filter(Favourite.user == login).all()
         poems = [fav.poem for fav in favs]
+        session.close()
         return poems
 
     # get object of login and poemId favourite
     def getFavouriteObject(self, login, poemId):
         session = super()._createSession()
         res = session.query(Favourite).filter(Favourite.user == login, Favourite.poem == poemId).first()
+        session.close()
         return res
