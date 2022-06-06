@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
-from services import PoemsService, UsersService
+from backend.services import PoemsService, UsersService
 
 # webscraping z strony wywrota.pl i poezja.org
 
-file = open('data/links_to_poems').read()
+file = open('../data/links_to_poems').read()
 links = file.split('\n')
 
 service = PoemsService()

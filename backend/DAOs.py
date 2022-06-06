@@ -1,7 +1,5 @@
 from sqlalchemy.orm import sessionmaker
-from db import engine, User, Poem, Opinion, Token, Favourite
-from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
+from backend.db import engine, User, Poem, Opinion, Token, Favourite
 
 
 def mergeSessions(obj1, obj2):

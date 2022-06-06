@@ -1,4 +1,4 @@
-from controllers import *
+from backend.controllers import *
 
 
 def testUsersDao():

@@ -1,5 +1,5 @@
 from flask import Flask
-from controllers import registerEndpoints
+from backend.controllers import registerEndpoints
 
 app = Flask(__name__)
 registerEndpoints(app)
