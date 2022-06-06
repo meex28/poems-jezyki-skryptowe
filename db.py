@@ -70,7 +70,7 @@ class User(Base):
 # storing tokens in database
 class Token(Base):
     __tablename__ = "tokens"
-    __token = Column('token', String(300), primary_key=True)
+    __token = Column('token', String(255), primary_key=True)
 
     def __init__(self, token):
         self.__token = token
@@ -125,5 +125,10 @@ class Opinion(Base):
 
 
 # creating mysql engine, and connect to DB
-engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')
+# connection to local DB
+# engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')
+
+# connection to heroku DB
+engine = create_engine('mysql+pymysql://bd7fa6bea46609:28f6dd83@eu-cdbr-west-02.cleardb.net/heroku_5cdeb3c4117633f')
+
 Base.metadata.create_all(bind=engine)

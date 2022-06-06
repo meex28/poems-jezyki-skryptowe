@@ -161,7 +161,6 @@ class PoemsService:
     # return 5 most recent poems for main page view
     def getMainPagePoems(self):
         poems = self.__poemsDAO.getLastPoems(5)
-        # TODO: pass opinions in constructor
 
         return self._poemsToPoemsPreviewDTO(poems)
 
@@ -201,7 +200,6 @@ class PoemsService:
 
     # add opinion to poem with id
     def addOpinion(self, id, token, content, rating):
-        # TODO: add token validation
         # decode token to get login and User object
         author = decodeToken(token)[1]
         author = self.__usersDAO.getUserByLogin(author)

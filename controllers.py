@@ -26,16 +26,20 @@ def registerEndpoints(app):
 class UsersController:
     __service = UsersService()
 
+    # check if request have token in cookies
     @staticmethod
     def checkToken(r):
         token = r.cookies.get('token')
         return UsersController.__service.checkToken(token)[0]
 
+    # on GET - get login view
+    # on POST - login with given login and password, get token in response
     @staticmethod
     def login():
         if request.method == 'GET':
             return render_template('login.html', logged=UsersController.checkToken(request))
         elif request.method == 'POST':
+            # if user send "login form" login to service and return token
             if request.form.get('submit') == 'login':
                 user, password = request.form.get('login'), request.form.get('password')
                 try:
@@ -45,12 +49,15 @@ class UsersController:
                     return resp
                 except Unauthorized as e:
                     return UsersController.error(str(e), request)
+            # if user send "register form" return register view
             elif request.form.get('submit') == 'register':
                 return redirect(url_for('register', logged=UsersController.checkToken(request)))
 
+    # logout from service
     @staticmethod
     def logout():
         if request.method == 'GET':
+            # if request doesnt have token then redirect to login page
             token = request.cookies.get('token')
             if token is None:
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
@@ -60,6 +67,8 @@ class UsersController:
             resp.delete_cookie('token')
             return resp
 
+    # GET - return register view
+    # POST - register new account or return login view
     @staticmethod
     def register():
         if request.method == 'GET':
@@ -76,6 +85,8 @@ class UsersController:
 
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
 
+    # rendering error page with given message
+    # r - request to check token
     @staticmethod
     def error(message, r):
         return render_template('error.html', message=message, logged=UsersController.checkToken(r))
@@ -84,25 +95,33 @@ class UsersController:
 class PoemsController:
     __service = PoemsService()
 
+    # render main page
     @staticmethod
     def mainPage():
         poems = PoemsController.__service.getMainPagePoems()
         return render_template('index.html', poems=poems, logged=UsersController.checkToken(request))
 
+    # render page with poems list of given authors
     @staticmethod
     def authorPage(author):
-        # TODO: add exception handling
-        author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
+        try:
+            author, poems = PoemsController.__service.getAuthorPoemsPreviews(author)
+        except ValueError as e:
+            return UsersController.error(str(e), request)
         return render_template('author_page.html', poems=poems, author=author,
                                logged=UsersController.checkToken(request))
 
+    # render page with poems list of given user-author
     @staticmethod
     def userAuthorPage(author):
-        # TODO: add exception handling
-        author, poems = PoemsController.__service.getUserPoemsPreviews(author)
+        try:
+            author, poems = PoemsController.__service.getUserPoemsPreviews(author)
+        except ValueError as e:
+            return UsersController.error(str(e), request)
         return render_template('author_page.html', poems=poems, author=author,
                                logged=UsersController.checkToken(request))
 
+    # return view page od given poem (by id)
     @staticmethod
     def poemPage(id):
         if request.method == 'GET':
@@ -111,12 +130,15 @@ class PoemsController:
             isFav = PoemsController.__service.isFavourite(token, id)
             return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request), isFav=isFav)
 
+    # GET - get view of add opinion form
+    # POST - add new opinion
     @staticmethod
     def addOpinion(id):
         if request.method == 'GET':
             return render_template('add_opinion_page.html', id=id, logged=UsersController.checkToken(request))
         elif request.method == 'POST':
-            if request.cookies.get('token') is None:
+            # check token
+            if not UsersController.checkToken(request):
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
 
             PoemsController.__service.addOpinion(id, request.cookies.get('token'),
