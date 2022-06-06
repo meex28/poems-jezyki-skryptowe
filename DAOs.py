@@ -62,6 +62,7 @@ class DAO:
 
 
 class UsersDAO(DAO):
+    # delete user with given login
     def deleteUserByLogin(self, login):
         session = super()._createSession()
         user = super()._get(User, login, session=session)
@@ -70,14 +71,17 @@ class UsersDAO(DAO):
         # delete user opinions
         opinions = session.query(Opinion).filter(Opinion.author_login == None).delete()
 
+    # get User object with given login
     def getUserByLogin(self, login):
         user = super()._get(User, login)
         return user
 
+    # get Token object
     def getToken(self, token):
         token = super()._get(Token, token)
         return token
 
+    # update password for given User
     def updatePassword(self, login, newPassword):
         session = super()._createSession()
         user = super()._get(User, login, session=session)
@@ -85,12 +89,15 @@ class UsersDAO(DAO):
         session.flush()
         session.commit()
 
+    # add new User
     def addUser(self, user):
         super()._add(user)
 
+    # add new Token
     def addToken(self, token):
         super()._add(token)
 
+    # delete Token
     def deleteToken(self, token):
         session = super()._createSession()
         token = super()._get(Token, token, session=session)
@@ -99,6 +106,7 @@ class UsersDAO(DAO):
 
 
 class PoemsDAO(DAO):
+    # add new Poem
     def addPoem(self, poem):
         super()._add(poem)
 
@@ -157,6 +165,7 @@ class PoemsDAO(DAO):
         poems = session.query(Poem).filter(Poem.title.like(f'%{title}%')).limit(limit).all()
         return poems
 
+    # get Poem with given author and title
     def getPoemByAuthorAndTitle(self, title, author):
         session = super()._createSession()
         poem = session.query(Poem).filter(Poem.title == title, Poem.author == author).first()
@@ -166,20 +175,22 @@ class PoemsDAO(DAO):
 class OpinionsDAO(DAO):
     # get session from opinion's author (user)
     # without that opinion and user/poem are in different sessions
-    # TODO: add deleting opinion when user/poem is deleted
     def addOpinion(self, opinion):
         session = DAO.Session.object_session(opinion.user)
         super()._add(opinion, session=session)
 
+    # get opinions for given poem
     def getPoemOpinions(self, poem):
         session = super()._createSession()
         opinions = session.query(Opinion).filter(Opinion.poem == poem).all()
         return opinions
 
+    # add poem to user's favourites
     def addToFavourites(self, login, poemId):
         fav = Favourite(login, poemId)
         super()._add(fav)
 
+    # delete poem from user's favourites
     def deleteFromFavourites(self, login, poemId):
         fav = self.getFavouriteObject(login, poemId)
         if fav is not None:
@@ -192,6 +203,7 @@ class OpinionsDAO(DAO):
         poems = [fav.poem for fav in favs]
         return poems
 
+    # get object of login and poemId favourite
     def getFavouriteObject(self, login, poemId):
         session = super()._createSession()
         res = session.query(Favourite).filter(Favourite.user == login, Favourite.poem == poemId).first()

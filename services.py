@@ -165,6 +165,7 @@ class PoemsService:
 
         return self._poemsToPoemsPreviewDTO(poems)
 
+    # get poem for every day (depends on date)
     def getDailyPoem(self, token=None):
         numberOfPoems = self.__poemsDAO.countPoems()
         today = date.today()

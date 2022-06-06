@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+# W niektórych klasach brak hermetyzacji pól ze względu na wymagania SQLAlchemy
 
 # storing favourite poems of users
 class Favourite(Base):
@@ -83,6 +84,7 @@ class Token(Base):
         self.__token = value
 
 
+# storing poems in database
 class Poem(Base):
     __tablename__ = "poems"
     id = Column('id', Integer, primary_key=True, autoincrement=True)
@@ -103,6 +105,7 @@ class Poem(Base):
         return f'{self.id} : {self.author} : {self.title} : {self.isUserAuthor} : {self.content}'
 
 
+# storing opinions in database
 class Opinion(Base):
     __tablename__ = 'opinions'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
