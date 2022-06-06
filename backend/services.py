@@ -203,6 +203,10 @@ class PoemsService:
         # decode token to get login and User object
         author = decodeToken(token)[1]
         author = self.__usersDAO.getUserByLogin(author)
+        possibleRatings = ['1', '2', '3', '4', '5']
+
+        if rating not in possibleRatings:
+            raise ValueError('Ocena powinna być liczbą całkowitą od 1 do 5')
 
         rating = int(rating)
 

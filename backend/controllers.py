@@ -141,8 +141,12 @@ class PoemsController:
             if not UsersController.checkToken(request):
                 return redirect(url_for('login', logged=UsersController.checkToken(request)))
 
-            PoemsController.__service.addOpinion(id, request.cookies.get('token'),
-                                                 request.form.get('content'), request.form.get('rating'))
+            try:
+                PoemsController.__service.addOpinion(id, request.cookies.get('token'),
+                                                     request.form.get('content'), request.form.get('rating'))
+            except ValueError as e:
+                return UsersController.error(str(e), request)
+
             poem = PoemsController.__service.getPoem(id)
 
             return render_template('poem_page.html', poem=poem, logged=UsersController.checkToken(request))
