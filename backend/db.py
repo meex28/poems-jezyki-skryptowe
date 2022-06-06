@@ -129,6 +129,7 @@ class Opinion(Base):
 # engine = create_engine('mysql+pymysql://root:pass@127.0.0.1:3306/daily-poem-db')
 
 # connection to heroku DB
-engine = create_engine('mysql+pymysql://bd7fa6bea46609:28f6dd83@eu-cdbr-west-02.cleardb.net/heroku_5cdeb3c4117633f')
+engine = create_engine('mysql+pymysql://bd7fa6bea46609:28f6dd83@eu-cdbr-west-02.cleardb.net/heroku_5cdeb3c4117633f',
+                       pool_size=100)
 
 Base.metadata.create_all(bind=engine)
